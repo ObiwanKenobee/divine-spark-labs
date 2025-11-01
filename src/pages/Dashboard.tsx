@@ -5,13 +5,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { BookOpen, Users, Lightbulb, Award } from "lucide-react";
+import { BookOpen, Users, Lightbulb, Award, Shield, Building2, Key } from "lucide-react";
+import { useUserRole } from "@/hooks/useUserRole";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { isAdmin } = useUserRole();
 
   useEffect(() => {
     // Check if user is logged in
@@ -70,6 +72,12 @@ const Dashboard = () => {
               The Joseph-Marie Foundation
             </h1>
             <div className="flex items-center gap-4">
+              {isAdmin && (
+                <Button variant="outline" onClick={() => navigate("/admin")}>
+                  <Shield className="mr-2 h-4 w-4" />
+                  Admin
+                </Button>
+              )}
               <span className="text-sm text-muted-foreground">
                 {user?.email}
               </span>
@@ -140,6 +148,32 @@ const Dashboard = () => {
             <CardContent>
               <Button variant="outline" className="w-full">
                 View Badges
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-elegant transition-shadow">
+            <CardHeader>
+              <Building2 className="h-8 w-8 text-primary mb-2" />
+              <CardTitle>Organizations</CardTitle>
+              <CardDescription>Manage your teams</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full" onClick={() => navigate("/organizations")}>
+                View Organizations
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-elegant transition-shadow">
+            <CardHeader>
+              <Key className="h-8 w-8 text-primary mb-2" />
+              <CardTitle>API Access</CardTitle>
+              <CardDescription>Integration keys</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="outline" className="w-full">
+                Manage Keys
               </Button>
             </CardContent>
           </Card>
