@@ -9,42 +9,63 @@ const Pricing = () => {
 
   const plans = [
     {
-      name: "Free",
-      price: "$0",
-      description: "Perfect for exploring",
+      name: "Open Access Sanctum",
+      price: "$0 - $100",
+      description: "Free or minimal cost for educational, ethical access",
+      impact: "Knowledge democratization for 1 billion+ minds",
       features: [
         "Access to core pillars content",
         "Community forum access",
-        "Monthly newsletter",
-        "Basic resources"
+        "Educational resources",
+        "Basic ethical frameworks",
+        "Monthly newsletter"
       ]
     },
     {
-      name: "Foundation",
-      price: "$29",
-      description: "For dedicated innovators",
+      name: "Innovator Tier",
+      price: "$500 - $5,000",
+      period: "/year",
+      description: "For creators, researchers, and faith-aligned innovators",
+      impact: "100,000+ innovators trained in moral design",
       features: [
-        "All Free features",
+        "All Sanctum features",
         "Premium research papers",
-        "Monthly webinars",
+        "Innovation toolkit & frameworks",
+        "Monthly webinars & workshops",
         "Direct mentorship access",
-        "Innovation toolkit",
-        "Priority support"
+        "Faith-tech collaboration network"
       ],
       popular: true
     },
     {
-      name: "Leadership",
-      price: "$99",
-      description: "For organizational transformation",
+      name: "Institutional Harmony",
+      price: "$50K - $500K",
+      period: "/deployment",
+      description: "For governments, universities, faith tech labs",
+      impact: "Institutional moral infrastructure across 50+ nations",
       features: [
-        "All Foundation features",
-        "Custom consulting sessions",
-        "Organization-wide license",
-        "Exclusive leadership retreats",
-        "White-label resources",
-        "24/7 dedicated support"
+        "All Innovator features",
+        "Custom deployment solutions",
+        "Organization-wide licensing",
+        "Dedicated technical support",
+        "Governance framework integration",
+        "White-label moral design tools"
       ]
+    },
+    {
+      name: "Civilization Architect",
+      price: "$1M - $100M+",
+      description: "For nations or global coalitions building autonomous sanctums",
+      impact: "Rebalance planetary systems — energy, ethics, economics",
+      features: [
+        "All Institutional features",
+        "Global coalition partnership",
+        "Autonomous sanctum development",
+        "Planetary-scale impact frameworks",
+        "24/7 dedicated civilization support",
+        "Co-creation of moral infrastructure"
+      ],
+      featured: true
     }
   ];
 
@@ -64,20 +85,23 @@ const Pricing = () => {
       </header>
 
       <main className="container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Choose Your Path to Divine Innovation
+        <div className="text-center mb-16 animate-fade-in">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Moral GDP — The Gross Divine Potential
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Join our community and access resources that unite faith, science, and innovation
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Choose your tier to transform faith, science, and innovation into planetary-scale impact
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+          {plans.map((plan, index) => (
             <Card 
               key={plan.name} 
-              className={`relative ${plan.popular ? 'border-primary shadow-elegant' : ''}`}
+              className={`relative transition-all duration-300 hover:scale-105 hover:shadow-elegant animate-fade-in ${
+                plan.popular ? 'border-primary shadow-elegant' : ''
+              } ${plan.featured ? 'border-secondary shadow-glow' : ''}`}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -86,28 +110,39 @@ const Pricing = () => {
                   </span>
                 </div>
               )}
+              {plan.featured && (
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                  <span className="bg-secondary text-secondary-foreground px-4 py-1 rounded-full text-sm font-semibold">
+                    Ultimate Impact
+                  </span>
+                </div>
+              )}
               <CardHeader>
-                <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                <CardDescription>{plan.description}</CardDescription>
+                <CardTitle className="text-xl">{plan.name}</CardTitle>
+                <CardDescription className="min-h-[3rem]">{plan.description}</CardDescription>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold">{plan.price}</span>
-                  <span className="text-muted-foreground">/month</span>
+                  <span className="text-2xl font-bold">{plan.price}</span>
+                  {plan.period && <span className="text-muted-foreground text-sm">{plan.period}</span>}
+                </div>
+                <div className="mt-3 p-3 bg-muted/50 rounded-lg border border-border">
+                  <p className="text-xs font-semibold text-primary mb-1">Expected Impact:</p>
+                  <p className="text-sm">{plan.impact}</p>
                 </div>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-3">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature}</span>
+                <ul className="space-y-2.5">
+                  {plan.features.map((feature, featureIndex) => (
+                    <li key={featureIndex} className="flex items-start gap-2">
+                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                      <span className="text-xs leading-relaxed">{feature}</span>
                     </li>
                   ))}
                 </ul>
               </CardContent>
               <CardFooter>
                 <Button 
-                  className="w-full" 
-                  variant={plan.popular ? "default" : "outline"}
+                  className="w-full transition-all duration-300 hover:scale-105" 
+                  variant={plan.popular || plan.featured ? "default" : "outline"}
                   onClick={() => navigate("/auth")}
                 >
                   Get Started
