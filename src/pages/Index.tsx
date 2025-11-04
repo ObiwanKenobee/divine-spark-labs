@@ -16,6 +16,9 @@ const Index = () => {
           <div className="flex justify-between items-center">
             <div className="text-white font-bold text-xl">JMF</div>
             <div className="flex gap-4">
+              <Button variant="ghost" className="text-white hover:bg-white/10" onClick={() => navigate("/enterprise")}>
+                Enterprise
+              </Button>
               <Button variant="ghost" className="text-white hover:bg-white/10" onClick={() => navigate("/pricing")}>
                 Pricing
               </Button>
