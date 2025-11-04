@@ -90,131 +90,131 @@ const Dashboard = () => {
       </header>
 
       <main className="container mx-auto px-4 py-16">
-        <div className="mb-12">
-          <h2 className="text-4xl font-bold mb-4">
+        <div className="mb-12 animate-fade-in">
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent">
             Welcome to Your Dashboard
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground animate-fade-in" style={{ animationDelay: '0.1s' }}>
             Access your resources and continue your journey of divine innovation
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <Card className="hover:shadow-elegant transition-shadow">
+          <Card className="group hover:shadow-elegant hover:-translate-y-1 transition-all duration-300 animate-fade-in cursor-pointer" style={{ animationDelay: '0.2s' }}>
             <CardHeader>
-              <BookOpen className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Resources</CardTitle>
+              <BookOpen className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform duration-300" />
+              <CardTitle className="group-hover:text-primary transition-colors">Resources</CardTitle>
               <CardDescription>Access research papers and materials</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                 Browse Library
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-elegant transition-shadow">
+          <Card className="group hover:shadow-elegant hover:-translate-y-1 transition-all duration-300 animate-fade-in cursor-pointer" style={{ animationDelay: '0.3s' }}>
             <CardHeader>
-              <Users className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Community</CardTitle>
+              <Users className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform duration-300" />
+              <CardTitle className="group-hover:text-primary transition-colors">Community</CardTitle>
               <CardDescription>Connect with fellow innovators</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                 Join Forums
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-elegant transition-shadow">
+          <Card className="group hover:shadow-elegant hover:-translate-y-1 transition-all duration-300 animate-fade-in cursor-pointer" style={{ animationDelay: '0.4s' }}>
             <CardHeader>
-              <Lightbulb className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Projects</CardTitle>
+              <Lightbulb className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform duration-300" />
+              <CardTitle className="group-hover:text-primary transition-colors">Projects</CardTitle>
               <CardDescription>Your innovation projects</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                 View Projects
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-elegant transition-shadow">
+          <Card className="group hover:shadow-elegant hover:-translate-y-1 transition-all duration-300 animate-fade-in cursor-pointer" style={{ animationDelay: '0.5s' }}>
             <CardHeader>
-              <Award className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Achievements</CardTitle>
+              <Award className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform duration-300" />
+              <CardTitle className="group-hover:text-primary transition-colors">Achievements</CardTitle>
               <CardDescription>Track your progress</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                 View Badges
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-elegant transition-shadow">
+          <Card className="group hover:shadow-elegant hover:-translate-y-1 transition-all duration-300 animate-fade-in cursor-pointer" style={{ animationDelay: '0.6s' }}>
             <CardHeader>
-              <Building2 className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>Organizations</CardTitle>
+              <Building2 className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform duration-300" />
+              <CardTitle className="group-hover:text-primary transition-colors">Organizations</CardTitle>
               <CardDescription>Manage your teams</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full" onClick={() => navigate("/organizations")}>
+              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => navigate("/organizations")}>
                 View Organizations
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-elegant transition-shadow">
+          <Card className="group hover:shadow-elegant hover:-translate-y-1 transition-all duration-300 animate-fade-in cursor-pointer" style={{ animationDelay: '0.7s' }}>
             <CardHeader>
-              <Key className="h-8 w-8 text-primary mb-2" />
-              <CardTitle>API Access</CardTitle>
+              <Key className="h-8 w-8 text-primary mb-2 group-hover:scale-110 transition-transform duration-300" />
+              <CardTitle className="group-hover:text-primary transition-colors">API Access</CardTitle>
               <CardDescription>Integration keys</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
                 Manage Keys
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        <Card>
+        <Card className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
           <CardHeader>
             <CardTitle>Getting Started</CardTitle>
             <CardDescription>Begin your journey with these essential steps</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-primary/5">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+            <div className="group flex items-start gap-4 p-4 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all duration-300 cursor-pointer hover:-translate-x-1">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold group-hover:scale-110 transition-transform duration-300">
                 1
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Complete Your Profile</h3>
+                <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">Complete Your Profile</h3>
                 <p className="text-sm text-muted-foreground">
                   Tell us about your interests and innovation goals
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-primary/5">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+            <div className="group flex items-start gap-4 p-4 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all duration-300 cursor-pointer hover:-translate-x-1">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold group-hover:scale-110 transition-transform duration-300">
                 2
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Explore Our Core Pillars</h3>
+                <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">Explore Our Core Pillars</h3>
                 <p className="text-sm text-muted-foreground">
                   Dive into theology, ethics, education, and sustainability
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-4 p-4 rounded-lg bg-primary/5">
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+            <div className="group flex items-start gap-4 p-4 rounded-lg bg-primary/5 hover:bg-primary/10 transition-all duration-300 cursor-pointer hover:-translate-x-1">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold group-hover:scale-110 transition-transform duration-300">
                 3
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Join a Community Project</h3>
+                <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">Join a Community Project</h3>
                 <p className="text-sm text-muted-foreground">
                   Collaborate with others on meaningful innovations
                 </p>
