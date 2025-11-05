@@ -47,6 +47,75 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string | null
+          event_hash: string
+          event_type: string
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          previous_hash: string | null
+          resource_id: string | null
+          resource_type: string | null
+          status: string | null
+          tenant_id: string | null
+          user_agent: string | null
+          workspace_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string | null
+          event_hash: string
+          event_type: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          previous_hash?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          workspace_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string | null
+          event_hash?: string
+          event_type?: string
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          previous_hash?: string | null
+          resource_id?: string | null
+          resource_type?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          workspace_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_events_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_logs: {
         Row: {
           action: string
@@ -79,6 +148,59 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      onboarding_consents: {
+        Row: {
+          accepted: boolean | null
+          accepted_at: string | null
+          consent_text: string
+          consent_type: Database["public"]["Enums"]["consent_type"]
+          consent_version: string
+          created_at: string | null
+          id: string
+          ip_address: unknown
+          metadata: Json | null
+          tenant_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted?: boolean | null
+          accepted_at?: string | null
+          consent_text: string
+          consent_type: Database["public"]["Enums"]["consent_type"]
+          consent_version: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted?: boolean | null
+          accepted_at?: string | null
+          consent_text?: string
+          consent_type?: Database["public"]["Enums"]["consent_type"]
+          consent_version?: string
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown
+          metadata?: Json | null
+          tenant_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_consents_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       organization_members: {
         Row: {
@@ -144,6 +266,9 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          onboarding_completed: boolean | null
+          onboarding_step: number | null
+          tenant_id: string | null
           updated_at: string
           user_id: string
         }
@@ -151,6 +276,9 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
+          tenant_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -158,8 +286,96 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
+          tenant_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_members: {
+        Row: {
+          id: string
+          invited_by: string | null
+          joined_at: string | null
+          role: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          role?: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          role?: string | null
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_members_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          billing_plan: string | null
+          compliance_flags: Json | null
+          created_at: string | null
+          created_by: string | null
+          data_residency: string | null
+          domain: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          billing_plan?: string | null
+          compliance_flags?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          data_residency?: string | null
+          domain?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          billing_plan?: string | null
+          compliance_flags?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          data_residency?: string | null
+          domain?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          slug?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -184,11 +400,122 @@ export type Database = {
         }
         Relationships: []
       }
+      workspace_members: {
+        Row: {
+          id: string
+          invited_by: string | null
+          joined_at: string | null
+          permissions: Json | null
+          role: Database["public"]["Enums"]["workspace_role"] | null
+          user_id: string
+          workspace_id: string
+        }
+        Insert: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          permissions?: Json | null
+          role?: Database["public"]["Enums"]["workspace_role"] | null
+          user_id: string
+          workspace_id: string
+        }
+        Update: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string | null
+          permissions?: Json | null
+          role?: Database["public"]["Enums"]["workspace_role"] | null
+          user_id?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspace_members_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string | null
+          created_by: string
+          data_classification:
+            | Database["public"]["Enums"]["data_classification"]
+            | null
+          description: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          provisioned_at: string | null
+          resource_quota: Json | null
+          slug: string
+          status: Database["public"]["Enums"]["workspace_status"] | null
+          tenant_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by: string
+          data_classification?:
+            | Database["public"]["Enums"]["data_classification"]
+            | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          provisioned_at?: string | null
+          resource_quota?: Json | null
+          slug: string
+          status?: Database["public"]["Enums"]["workspace_status"] | null
+          tenant_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string
+          data_classification?:
+            | Database["public"]["Enums"]["data_classification"]
+            | null
+          description?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          provisioned_at?: string | null
+          resource_quota?: Json | null
+          slug?: string
+          status?: Database["public"]["Enums"]["workspace_status"] | null
+          tenant_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspaces_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      generate_event_hash: {
+        Args: {
+          p_action: string
+          p_actor_id: string
+          p_event_type: string
+          p_metadata: Json
+          p_previous_hash: string
+          p_timestamp: string
+        }
+        Returns: string
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -206,9 +533,40 @@ export type Database = {
         }
         Returns: string
       }
+      log_audit_event_immutable: {
+        Args: {
+          p_action: string
+          p_event_type: string
+          p_metadata?: Json
+          p_resource_id?: string
+          p_resource_type?: string
+          p_tenant_id?: string
+          p_workspace_id?: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "admin" | "member" | "viewer"
+      consent_type:
+        | "terms_of_service"
+        | "privacy_policy"
+        | "data_processing"
+        | "research_ethics"
+      data_classification: "public" | "restricted" | "sacred"
+      workspace_role:
+        | "owner"
+        | "admin"
+        | "project_lead"
+        | "fellow"
+        | "researcher"
+        | "observer"
+      workspace_status:
+        | "provisioning"
+        | "active"
+        | "suspended"
+        | "archived"
+        | "deleted"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -337,6 +695,28 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "member", "viewer"],
+      consent_type: [
+        "terms_of_service",
+        "privacy_policy",
+        "data_processing",
+        "research_ethics",
+      ],
+      data_classification: ["public", "restricted", "sacred"],
+      workspace_role: [
+        "owner",
+        "admin",
+        "project_lead",
+        "fellow",
+        "researcher",
+        "observer",
+      ],
+      workspace_status: [
+        "provisioning",
+        "active",
+        "suspended",
+        "archived",
+        "deleted",
+      ],
     },
   },
 } as const

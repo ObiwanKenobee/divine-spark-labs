@@ -11,6 +11,8 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import Organizations from "./pages/Organizations";
 import Enterprise from "./pages/Enterprise";
+import Onboarding from "./pages/Onboarding";
+import Workspaces from "./pages/Workspaces";
 
 const queryClient = new QueryClient();
 
@@ -25,7 +27,9 @@ const App = () => (
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/enterprise" element={<Enterprise />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/workspaces" element={<Workspaces />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/organizations" element={<Organizations />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
