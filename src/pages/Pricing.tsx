@@ -10,7 +10,7 @@ const Pricing = () => {
   const plans = [
     {
       name: "Open Access Sanctum",
-      price: "$0 - $100",
+      price: "$0 - $200",
       description: "Free or minimal cost for educational, ethical access",
       impact: "Knowledge democratization for 1 billion+ minds",
       features: [
@@ -18,12 +18,13 @@ const Pricing = () => {
         "Community forum access",
         "Educational resources",
         "Basic ethical frameworks",
-        "Monthly newsletter"
+        "Monthly newsletter",
+        "Observer workspace access"
       ]
     },
     {
       name: "Innovator Tier",
-      price: "$500 - $5,000",
+      price: "$1,000 - $10,000",
       period: "/year",
       description: "For creators, researchers, and faith-aligned innovators",
       impact: "100,000+ innovators trained in moral design",
@@ -33,28 +34,33 @@ const Pricing = () => {
         "Innovation toolkit & frameworks",
         "Monthly webinars & workshops",
         "Direct mentorship access",
-        "Faith-tech collaboration network"
+        "Faith-tech collaboration network",
+        "Fellow workspace privileges",
+        "Project lead capabilities"
       ],
       popular: true
     },
     {
       name: "Institutional Harmony",
-      price: "$50K - $500K",
+      price: "$100K - $1M",
       period: "/deployment",
       description: "For governments, universities, faith tech labs",
       impact: "Institutional moral infrastructure across 50+ nations",
       features: [
         "All Innovator features",
         "Custom deployment solutions",
-        "Organization-wide licensing",
+        "Multi-tenant organization licensing",
         "Dedicated technical support",
         "Governance framework integration",
-        "White-label moral design tools"
+        "White-label moral design tools",
+        "Admin workspace management",
+        "Enterprise SSO integration",
+        "Compliance & audit logging"
       ]
     },
     {
       name: "Civilization Architect",
-      price: "$1M - $100M+",
+      price: "$2M - $200M+",
       description: "For nations or global coalitions building autonomous sanctums",
       impact: "Rebalance planetary systems — energy, ethics, economics",
       features: [
@@ -63,7 +69,10 @@ const Pricing = () => {
         "Autonomous sanctum development",
         "Planetary-scale impact frameworks",
         "24/7 dedicated civilization support",
-        "Co-creation of moral infrastructure"
+        "Co-creation of moral infrastructure",
+        "Owner-level workspace control",
+        "Custom infrastructure deployment",
+        "Strategic advisory board access"
       ],
       featured: true
     }
