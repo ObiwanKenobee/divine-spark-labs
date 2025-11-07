@@ -29,13 +29,19 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-[60vh] md:min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background Image with Overlay */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${heroImage})` }}
-      >
+      {/* Background Image with responsive <img> for better performance */}
+      <picture className="absolute inset-0 block w-full h-full">
+        <source srcSet={heroImage} media="(min-width:1024px)" />
+        <source srcSet={heroImage} media="(min-width:640px)" />
+        <img
+          src={heroImage}
+          alt="Divine innovation background"
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-primary/95 via-primary/85 to-background/95" />
-      </div>
+      </picture>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 sm:px-6 text-center">
