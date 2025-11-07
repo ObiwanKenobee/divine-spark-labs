@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Search, Globe, LogIn, Users } from "lucide-react";
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Header() {
