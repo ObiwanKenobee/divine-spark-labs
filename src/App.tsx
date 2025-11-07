@@ -21,6 +21,7 @@ import Impact from "./pages/Impact";
 import Ethics from "./pages/Ethics";
 import Community from "./pages/Community";
 import Solutions from "./pages/Solutions";
+import Innovator from "./pages/Innovator";
 
 const queryClient = new QueryClient();
 
