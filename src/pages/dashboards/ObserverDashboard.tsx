@@ -34,8 +34,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Follow ongoing initiatives</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              View Updates
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Project Updates')}>
+              <span className="flex items-center justify-center gap-2 w-full">View Updates{lastSpark === 'Project Updates' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
