@@ -42,7 +42,7 @@ export default function Header() {
   const onSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!search) return;
-    window.location.href = `/search?q=${encodeURIComponent(search)}`;
+    navigate(`/search?q=${encodeURIComponent(search)}`);
   };
 
   const [mobileOpen, setMobileOpen] = useState(false);
