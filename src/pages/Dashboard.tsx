@@ -24,7 +24,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         navigate("/auth");
         setLoading(false);
@@ -41,6 +41,21 @@ const Dashboard = () => {
         .single();
 
       if (profile?.tenant_id) {
+        // get tenant billing plan
+        try {
+          const { data: tenant } = await supabase
+            .from('tenants')
+            .select('billing_plan')
+            .eq('id', profile.tenant_id)
+            .maybeSingle();
+
+          if (tenant && tenant.billing_plan) {
+            setTenantPlan(tenant.billing_plan as string);
+          }
+        } catch (e) {
+          console.warn('Failed to fetch tenant plan', e);
+        }
+
         // Get user's highest workspace role
         const { data: workspaceData } = await supabase
           .from('workspace_members')
