@@ -14,6 +14,8 @@ import Enterprise from "./pages/Enterprise";
 import Onboarding from "./pages/Onboarding";
 import Workspaces from "./pages/Workspaces";
 import PaymentStatus from "./pages/PaymentStatus";
+import HeaderDemo from "./pages/HeaderDemo";
+import FooterDemo from "./pages/FooterDemo";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/payment/status" element={<PaymentStatus />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/organizations" element={<Organizations />} />
+          <Route path="/header-demo" element={<HeaderDemo />} />
+          <Route path="/footer-demo" element={<FooterDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
