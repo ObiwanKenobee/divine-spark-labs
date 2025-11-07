@@ -170,13 +170,16 @@ const Pricing = () => {
                 <Button
                   className="w-full transition-all duration-300 hover:scale-105"
                   variant={(plan as any).popular || (plan as any).featured ? "default" : "outline"}
-                  onClick={() => handleGetStarted(plan as any)}
+                  onClick={() => setActivePlan(plan as any)}
                 >
                   Get Started
                 </Button>
               </CardFooter>
             </Card>
           ))}
+          {activePlan && (
+            <PaymentSelector plan={activePlan} onClose={() => setActivePlan(null)} />
+          )}
         </div>
       </main>
 
