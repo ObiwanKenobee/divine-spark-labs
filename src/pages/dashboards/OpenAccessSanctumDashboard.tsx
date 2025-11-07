@@ -98,7 +98,7 @@ export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | n
             <CardDescription>Join community discussions and peer learning</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full" onClick={() => window.open('https://community.example.com', '_blank')}>Open Forum</Button>
+            <Button variant="outline" className="w-full" onClick={() => trigger('Community Forum', () => window.open('https://community.example.com', '_blank'))}><span className="flex items-center justify-center gap-2 w-full">Open Forum{lastSpark === 'Community Forum' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span></Button>
           </CardContent>
         </Card>
 
