@@ -1,8 +1,20 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, BookOpen, Video, MessageCircle, Calendar, Bell } from "lucide-react";
+import { Eye, BookOpen, Video, MessageCircle, Calendar, Bell, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export const ObserverDashboard = () => {
+  const [lastSpark, setLastSpark] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const trigger = (label: string, cb?: () => void) => {
+    setLastSpark(label);
+    toast({ title: label, description: 'Opened ' + label });
+    if (cb) cb();
+    setTimeout(() => setLastSpark(null), 900);
+  };
+
   return (
     <>
       <div className="mb-12 animate-fade-in">
