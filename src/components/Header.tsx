@@ -157,20 +157,20 @@ export default function Header() {
       {mobileOpen && (
         <div className="md:hidden absolute left-0 right-0 top-16 bg-white border-t shadow-lg p-4 z-40">
           <div className="flex flex-col gap-2">
-            <a href="#platform" className="py-2 px-3 rounded hover:bg-slate-50">Platform</a>
-            <a href="#impact" className="py-2 px-3 rounded hover:bg-slate-50">Impact</a>
-            <a href="#ethics" className="py-2 px-3 rounded hover:bg-slate-50">Ethics</a>
-            <a href="#community" className="py-2 px-3 rounded hover:bg-slate-50">Community</a>
+            <button onClick={() => { navigate('/platform'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Platform</button>
+            <button onClick={() => { navigate('/impact'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Impact</button>
+            <button onClick={() => { navigate('/ethics'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Ethics</button>
+            <button onClick={() => { navigate('/community'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Community</button>
             <div className="border-t pt-2 mt-2">
-              <a href="#discernment-api" className="block py-2 px-3 rounded hover:bg-slate-50">Discernment API</a>
-              <a href="#wisdomgraph" className="block py-2 px-3 rounded hover:bg-slate-50">Wisdom Graph</a>
-              <a href="#impact-cloud" className="block py-2 px-3 rounded hover:bg-slate-50">Impact Cloud</a>
-              <a href="#ethicsops" className="block py-2 px-3 rounded hover:bg-slate-50">EthicsOps</a>
+              <button onClick={() => { navigate('/solutions#discernment-api'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Discernment API</button>
+              <button onClick={() => { navigate('/solutions#wisdomgraph'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Wisdom Graph</button>
+              <button onClick={() => { navigate('/solutions#impact-cloud'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Impact Cloud</button>
+              <button onClick={() => { navigate('/solutions#ethicsops'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">EthicsOps</button>
             </div>
             <div className="border-t pt-2 mt-2 flex flex-col gap-2">
-              <button className="py-2 px-3 rounded bg-primary text-primary-foreground" onClick={() => (window.location.href = '/enterprise')}>Enterprise</button>
-              <button className="py-2 px-3 rounded border" onClick={() => (window.location.href = '/pricing')}>Pricing</button>
-              <button className="py-2 px-3 rounded" onClick={() => (window.location.href = '/auth')}>Sign In</button>
+              <button className="py-2 px-3 rounded bg-primary text-primary-foreground" onClick={() => { navigate('/enterprise'); setMobileOpen(false); }}>Enterprise</button>
+              <button className="py-2 px-3 rounded border" onClick={() => { navigate('/pricing'); setMobileOpen(false); }}>Pricing</button>
+              <button className="py-2 px-3 rounded" onClick={() => { navigate('/auth'); setMobileOpen(false); }}>Sign In</button>
             </div>
           </div>
         </div>
