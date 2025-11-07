@@ -109,7 +109,7 @@ export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | n
             <CardDescription>Access curated learning materials and toolkits</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full" onClick={() => navigate('/')}>Browse Resources</Button>
+            <Button variant="outline" className="w-full" onClick={() => trigger('Resources', () => navigate('/'))}><span className="flex items-center justify-center gap-2 w-full">Browse Resources{lastSpark === 'Resources' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span></Button>
           </CardContent>
         </Card>
 
