@@ -88,10 +88,10 @@ export default function Header() {
 
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content sideOffset={8} align="end" className="absolute right-0 mt-3 w-72 bg-white border rounded-lg shadow-lg p-2">
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.hash = '#discernment-api')}>Discernment API</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.hash = '#wisdomgraph')}>Wisdom Graph</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.hash = '#impact-cloud')}>Impact Cloud</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.hash = '#ethicsops')}>EthicsOps</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#discernment-api')}>Discernment API</DropdownMenu.Item>
+                        <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#wisdomgraph')}>Wisdom Graph</DropdownMenu.Item>
+                        <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#impact-cloud')}>Impact Cloud</DropdownMenu.Item>
+                        <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#ethicsops')}>EthicsOps</DropdownMenu.Item>
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
