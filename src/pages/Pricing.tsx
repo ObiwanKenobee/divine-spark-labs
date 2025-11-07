@@ -173,9 +173,20 @@ const Pricing = () => {
                 <Button
                   className="w-full transition-all duration-300 hover:scale-105"
                   variant={(plan as any).popular || (plan as any).featured ? "default" : "outline"}
-                  onClick={() => setActivePlan(plan as any)}
+                  onClick={() => {
+                    setSparkLast(plan.slug);
+                    setActivePlan(plan as any);
+                    setTimeout(() => setSparkLast(''), 900);
+                  }}
                 >
-                  Get Started
+                  <span className="flex items-center justify-center gap-2 w-full">
+                    Get Started
+                    {sparkLast === plan.slug && (
+                      <span className="spark-anim inline-block">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                      </span>
+                    )}
+                  </span>
                 </Button>
               </CardFooter>
             </Card>
