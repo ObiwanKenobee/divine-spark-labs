@@ -267,6 +267,56 @@ const Admin = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="subscribers" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Newsletter Subscribers</CardTitle>
+                <CardDescription>Manage newsletter subscribers and exports</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-end mb-4">
+                  <Button onClick={async () => {
+                    try {
+                      const { data } = await supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false });
+                      if (!data) return;
+                      const csvRows = [Object.keys(data[0]).join(',')];
+                      data.forEach((row: any) => {
+                        csvRows.push(Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+                      });
+                      const csv = csvRows.join('\n');
+                      const blob = new Blob([csv], { type: 'text/csv' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'subscribers.csv';
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    } catch (e) {
+                      console.error('Export failed', e);
+                      toast({ title: 'Export failed', description: e.message, variant: 'destructive' });
+                    }
+                  }}>Export CSV</Button>
+                </div>
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Plan</TableHead>
+                      <TableHead>Tenant</TableHead>
+                      <TableHead>Subscribed</TableHead>
+                      <TableHead>Unsubscribed</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {/* Subscribers will be loaded into state via useEffect below */}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
