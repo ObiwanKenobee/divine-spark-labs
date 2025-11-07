@@ -122,14 +122,30 @@ export default function Header() {
                 </select>
               </div>
 
-              <div className="ml-2">
-                <Button variant="outline" size="sm" onClick={() => (window.location.href = '/auth')}>Sign In</Button>
-              </div>
+              <div className="flex items-center gap-2">
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
+                    <button aria-label="User menu" className="hidden sm:inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent font-semibold">JM</button>
+                  </DropdownMenu.Trigger>
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content sideOffset={6} align="end" className="absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg p-2">
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.href = '/auth?provider=google')}>Sign in with Google</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.href = '/auth')}>Sign in with Email</DropdownMenu.Item>
+                      <DropdownMenu.Separator className="my-1" />
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.href = '/onboarding')}>Create Account</DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
 
-              <div className="md:hidden ml-2">
-                <button aria-label="Open menu" className="p-2 rounded-md border" onClick={() => setMobileOpen((s) => !s)}>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 5h14a1 1 0 010 2H3a1 1 0 110-2zm0 4h14a1 1 0 010 2H3a1 1 0 110-2zm0 4h14a1 1 0 010 2H3a1 1 0 110-2z" clipRule="evenodd"/></svg>
-                </button>
+                <div className="ml-2">
+                  <Button variant="outline" size="sm" onClick={() => (window.location.href = '/auth')}>Sign In</Button>
+                </div>
+
+                <div className="md:hidden ml-2">
+                  <button aria-label="Open menu" className="p-2 rounded-md border" onClick={() => setMobileOpen((s) => !s)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 5h14a1 1 0 010 2H3a1 1 0 110-2zm0 4h14a1 1 0 010 2H3a1 1 0 110-2zm0 4h14a1 1 0 010 2H3a1 1 0 110-2z" clipRule="evenodd"/></svg>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
