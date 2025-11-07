@@ -9,6 +9,7 @@ import LossAversion from "@/components/LossAversion";
 import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import AIChat from "@/components/AIChat";
 import ResearchAssistant from "@/components/ResearchAssistant";
 import { Button } from "@/components/ui/button";
