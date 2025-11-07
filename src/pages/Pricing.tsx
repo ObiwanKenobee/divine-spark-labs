@@ -9,6 +9,7 @@ const Pricing = () => {
 
   const plans = [
     {
+      slug: "sanctum",
       name: "Open Access Sanctum",
       price: "$0 - $200",
       description: "Free or minimal cost for educational, ethical access",
@@ -23,6 +24,7 @@ const Pricing = () => {
       ]
     },
     {
+      slug: "innovator",
       name: "Innovator Tier",
       price: "$1,000 - $10,000",
       period: "/year",
@@ -41,6 +43,7 @@ const Pricing = () => {
       popular: true
     },
     {
+      slug: "institutional",
       name: "Institutional Harmony",
       price: "$100K - $1M",
       period: "/deployment",
@@ -59,6 +62,7 @@ const Pricing = () => {
       ]
     },
     {
+      slug: "civilization",
       name: "Civilization Architect",
       price: "$2M - $200M+",
       description: "For nations or global coalitions building autonomous sanctums",
@@ -77,6 +81,20 @@ const Pricing = () => {
       featured: true
     }
   ];
+
+  const handleGetStarted = (plan: { slug: string }) => {
+    const linkKey = `VITE_PAYMENT_LINK_${plan.slug.toUpperCase()}` as keyof ImportMetaEnv;
+    const paymentLink = import.meta.env[linkKey as any] as string | undefined;
+
+    localStorage.setItem("pendingPlan", plan.slug);
+
+    if (paymentLink && paymentLink.startsWith("http")) {
+      window.location.href = paymentLink;
+      return;
+    }
+
+    navigate(`/auth?plan=${encodeURIComponent(plan.slug)}`);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -105,21 +123,21 @@ const Pricing = () => {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
-            <Card 
-              key={plan.name} 
+            <Card
+              key={plan.name}
               className={`relative transition-all duration-300 hover:scale-105 hover:shadow-elegant animate-fade-in ${
-                plan.popular ? 'border-primary shadow-elegant' : ''
-              } ${plan.featured ? 'border-secondary shadow-glow' : ''}`}
+                (plan as any).popular ? 'border-primary shadow-elegant' : ''
+              } ${(plan as any).featured ? 'border-secondary shadow-glow' : ''}`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
-              {plan.popular && (
+              {(plan as any).popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="bg-primary text-primary-foreground px-4 py-1 rounded-full text-sm font-semibold">
                     Most Popular
                   </span>
                 </div>
               )}
-              {plan.featured && (
+              {(plan as any).featured && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                   <span className="bg-secondary text-secondary-foreground px-4 py-1 rounded-full text-sm font-semibold">
                     Ultimate Impact
@@ -131,7 +149,7 @@ const Pricing = () => {
                 <CardDescription className="min-h-[3rem]">{plan.description}</CardDescription>
                 <div className="mt-4">
                   <span className="text-2xl font-bold">{plan.price}</span>
-                  {plan.period && <span className="text-muted-foreground text-sm">{plan.period}</span>}
+                  {(plan as any).period && <span className="text-muted-foreground text-sm">{(plan as any).period}</span>}
                 </div>
                 <div className="mt-3 p-3 bg-muted/50 rounded-lg border border-border">
                   <p className="text-xs font-semibold text-primary mb-1">Expected Impact:</p>
@@ -140,7 +158,7 @@ const Pricing = () => {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2.5">
-                  {plan.features.map((feature, featureIndex) => (
+                  {(plan as any).features.map((feature: string, featureIndex: number) => (
                     <li key={featureIndex} className="flex items-start gap-2">
                       <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                       <span className="text-xs leading-relaxed">{feature}</span>
@@ -149,10 +167,10 @@ const Pricing = () => {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button 
-                  className="w-full transition-all duration-300 hover:scale-105" 
-                  variant={plan.popular || plan.featured ? "default" : "outline"}
-                  onClick={() => navigate("/auth")}
+                <Button
+                  className="w-full transition-all duration-300 hover:scale-105"
+                  variant={(plan as any).popular || (plan as any).featured ? "default" : "outline"}
+                  onClick={() => handleGetStarted(plan as any)}
                 >
                   Get Started
                 </Button>
