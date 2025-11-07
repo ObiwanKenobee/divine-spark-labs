@@ -120,7 +120,7 @@ export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | n
             <CardDescription>Practical ethical design and governance templates</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full" onClick={() => navigate('/')}>View Frameworks</Button>
+            <Button variant="outline" className="w-full" onClick={() => trigger('Ethical Frameworks', () => navigate('/'))}><span className="flex items-center justify-center gap-2 w-full">View Frameworks{lastSpark === 'Ethical Frameworks' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span></Button>
           </CardContent>
         </Card>
 
