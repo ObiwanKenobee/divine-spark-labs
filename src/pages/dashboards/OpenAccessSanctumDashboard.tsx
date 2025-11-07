@@ -141,7 +141,7 @@ export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | n
                 required
               />
               <div className="flex gap-3">
-                <Button type="submit" className="w-full" disabled={loading}>{loading ? 'Subscribing...' : 'Subscribe'}</Button>
+                <Button type="submit" className="w-full" disabled={loading} onClick={() => setLastSpark('Subscribe')}>{loading ? 'Subscribing...' : 'Subscribe'}{lastSpark === 'Subscribe' && <span className="ml-2 spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</Button>
                 <Button variant="outline" onClick={() => setEmail('')}>Clear</Button>
               </div>
             </form>
