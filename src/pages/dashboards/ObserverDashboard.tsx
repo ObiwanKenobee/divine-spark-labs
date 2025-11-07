@@ -73,8 +73,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Join discussions</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              Join Forum
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Community', () => window.open('https://community.example.com', '_blank'))}>
+              <span className="flex items-center justify-center gap-2 w-full">Join Forum{lastSpark === 'Community' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
