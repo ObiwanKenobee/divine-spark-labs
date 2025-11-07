@@ -9,6 +9,7 @@ import PaymentSelector from "@/components/PaymentSelector";
 const Pricing = () => {
   const navigate = useNavigate();
   const [activePlan, setActivePlan] = useState<any | null>(null);
+  const [sparkLast, setSparkLast] = useState<string>('');
 
   const plans = [
     {
