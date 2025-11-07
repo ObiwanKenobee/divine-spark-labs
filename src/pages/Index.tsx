@@ -9,6 +9,7 @@ import LossAversion from "@/components/LossAversion";
 import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
+import AIChat from "@/components/AIChat";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -18,17 +19,29 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <header className="absolute top-0 left-0 right-0 z-10">
-        <div className="container mx-auto px-6 py-6">
+        <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex justify-between items-center">
-            <div className="text-primary-foreground font-bold text-xl">JMF</div>
-            <div className="flex gap-4">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10" onClick={() => navigate("/enterprise")}>
+            <div className="text-primary-foreground font-bold text-lg sm:text-xl">JMF</div>
+            <div className="flex gap-2 sm:gap-4">
+              <Button 
+                variant="ghost" 
+                className="text-primary-foreground hover:bg-primary-foreground/10 text-sm sm:text-base px-2 sm:px-4" 
+                onClick={() => navigate("/enterprise")}
+              >
                 Enterprise
               </Button>
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/10" onClick={() => navigate("/pricing")}>
+              <Button 
+                variant="ghost" 
+                className="text-primary-foreground hover:bg-primary-foreground/10 text-sm sm:text-base px-2 sm:px-4" 
+                onClick={() => navigate("/pricing")}
+              >
                 Pricing
               </Button>
-              <Button variant="outline" className="text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/10" onClick={() => navigate("/auth")}>
+              <Button 
+                variant="outline" 
+                className="text-primary-foreground border-primary-foreground/30 hover:bg-primary-foreground/10 text-sm sm:text-base px-2 sm:px-4" 
+                onClick={() => navigate("/auth")}
+              >
                 Sign In
               </Button>
             </div>
@@ -46,6 +59,7 @@ const Index = () => {
       <FAQ />
       <CTA />
       <Footer />
+      <AIChat />
     </div>
   );
 };

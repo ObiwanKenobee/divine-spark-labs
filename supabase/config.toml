@@ -1,1 +1,7 @@
 project_id = "hpkrccllgbepuiilkrlz"
+
+[functions.chat]
+verify_jwt = false
+
+[functions.provision-workspace]
+verify_jwt = true
