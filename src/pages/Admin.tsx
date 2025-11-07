@@ -17,6 +17,7 @@ const Admin = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [organizations, setOrganizations] = useState<any[]>([]);
+  const [subscribers, setSubscribers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
