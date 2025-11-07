@@ -86,8 +86,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Upcoming activities</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              View Calendar
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Events')}>
+              <span className="flex items-center justify-center gap-2 w-full">View Calendar{lastSpark === 'Events' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
