@@ -3,9 +3,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
+import { useState } from "react";
+import PaymentSelector from "@/components/PaymentSelector";
 
 const Pricing = () => {
   const navigate = useNavigate();
+  const [activePlan, setActivePlan] = useState<any | null>(null);
 
   const plans = [
     {
