@@ -5,7 +5,6 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [lang, setLang] = useState(() => localStorage.getItem('jmf_lang') || 'en');
   const [workspaces, setWorkspaces] = useState<any[]>([]);
