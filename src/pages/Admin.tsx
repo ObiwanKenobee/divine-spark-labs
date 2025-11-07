@@ -321,7 +321,39 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* Subscribers will be loaded into state via useEffect below */}
+                    {subscribers.map((s) => (
+                      <TableRow key={s.id}>
+                        <TableCell className="font-medium">{s.email}</TableCell>
+                        <TableCell>{s.plan}</TableCell>
+                        <TableCell>{s.tenant_id || '-'}</TableCell>
+                        <TableCell>{s.subscribed_at ? new Date(s.subscribed_at).toLocaleString() : '-'}</TableCell>
+                        <TableCell>{s.unsubscribed ? `Yes (${s.unsubscribed_at ? new Date(s.unsubscribed_at).toLocaleString() : ''})` : 'No'}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="outline" onClick={async () => {
+                              try {
+                                // call unsubscribe function
+                                const fnBase = ((import.meta as any).env.VITE_SUPABASE_FUNCTIONS_URL || '').trim() || '';
+                                const url = fnBase ? `${fnBase.replace(/\/$/, '')}/newsletter-unsubscribe` : '/newsletter-unsubscribe';
+                                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: s.unsubscribe_token, email: s.email }) });
+                                if (!res.ok) throw new Error('Unsubscribe failed');
+                                // update local state
+                                setSubscribers(prev => prev.map(p => p.id === s.id ? { ...p, unsubscribed: true, unsubscribed_at: new Date().toISOString() } : p));
+                                toast({ title: 'Unsubscribed', description: `${s.email} unsubscribed.` });
+                              } catch (e:any) {
+                                console.error('Unsubscribe error', e);
+                                toast({ title: 'Error', description: e.message || 'Failed to unsubscribe', variant: 'destructive' });
+                              }
+                            }}>Unsubscribe</Button>
+
+                            <Button onClick={() => {
+                              // open mailto for quick contact
+                              window.location.href = `mailto:${s.email}?subject=Newsletter&body=Hello`;
+                            }}>Contact</Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </CardContent>
