@@ -47,8 +47,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Educational materials</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              Browse Library
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Resources', () => window.location.href = '/') }>
+              <span className="flex items-center justify-center gap-2 w-full">Browse Library{lastSpark === 'Resources' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
