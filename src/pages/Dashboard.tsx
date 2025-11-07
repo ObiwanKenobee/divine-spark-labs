@@ -12,6 +12,7 @@ import { DonorDashboard } from "./dashboards/DonorDashboard";
 import { AdminDashboard } from "./dashboards/AdminDashboard";
 import { InstitutionalDashboard } from "./dashboards/InstitutionalDashboard";
 import { ObserverDashboard } from "./dashboards/ObserverDashboard";
+import OpenAccessSanctumDashboard from "./dashboards/OpenAccessSanctumDashboard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,12 +20,13 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [tenantPlan, setTenantPlan] = useState<string | null>(null);
   const { isAdmin } = useUserRole();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         navigate("/auth");
         setLoading(false);
@@ -41,6 +43,21 @@ const Dashboard = () => {
         .single();
 
       if (profile?.tenant_id) {
+        // get tenant billing plan
+        try {
+          const { data: tenant } = await supabase
+            .from('tenants')
+            .select('billing_plan')
+            .eq('id', profile.tenant_id)
+            .maybeSingle();
+
+          if (tenant && tenant.billing_plan) {
+            setTenantPlan(tenant.billing_plan as string);
+          }
+        } catch (e) {
+          console.warn('Failed to fetch tenant plan', e);
+        }
+
         // Get user's highest workspace role
         const { data: workspaceData } = await supabase
           .from('workspace_members')
@@ -128,6 +145,7 @@ const Dashboard = () => {
 
       <main className="container mx-auto px-4 py-16">
         {isAdmin && <AdminDashboard />}
+        {!isAdmin && tenantPlan === 'sanctum' && <OpenAccessSanctumDashboard />}
         {!isAdmin && userRole === 'owner' && <InstitutionalDashboard />}
         {!isAdmin && userRole === 'admin' && <InstitutionalDashboard />}
         {!isAdmin && userRole === 'lead' && <FellowDashboard />}

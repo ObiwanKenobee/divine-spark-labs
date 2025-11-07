@@ -17,6 +17,7 @@ const Admin = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [organizations, setOrganizations] = useState<any[]>([]);
+  const [subscribers, setSubscribers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +40,7 @@ const Admin = () => {
         const { data: profilesData } = await supabase
           .from('profiles')
           .select('*, user_roles(role)');
-        
+
         setUsers(profilesData || []);
 
         // Fetch audit logs
@@ -48,15 +49,24 @@ const Admin = () => {
           .select('*')
           .order('created_at', { ascending: false })
           .limit(50);
-        
+
         setAuditLogs(logsData || []);
 
         // Fetch organizations
         const { data: orgsData } = await supabase
           .from('organizations')
           .select('*, organization_members(count)');
-        
+
         setOrganizations(orgsData || []);
+
+        // Fetch subscribers
+        const { data: subsData } = await supabase
+          .from('newsletter_subscribers')
+          .select('*')
+          .order('subscribed_at', { ascending: false })
+          .limit(1000);
+
+        setSubscribers(subsData || []);
       } catch (error: any) {
         toast({
           title: "Error loading admin data",
@@ -156,6 +166,7 @@ const Admin = () => {
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="organizations">Organizations</TabsTrigger>
             <TabsTrigger value="audit">Audit Logs</TabsTrigger>
+            <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-4">
@@ -258,6 +269,88 @@ const Admin = () => {
                         <TableCell className="text-sm">{log.user_id?.substring(0, 8)}...</TableCell>
                         <TableCell className="text-sm">
                           {new Date(log.created_at).toLocaleString()}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="subscribers" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Newsletter Subscribers</CardTitle>
+                <CardDescription>Manage newsletter subscribers and exports</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-end mb-4">
+                  <Button onClick={async () => {
+                    try {
+                      const { data } = await supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false });
+                      if (!data) return;
+                      const csvRows = [Object.keys(data[0]).join(',')];
+                      data.forEach((row: any) => {
+                        csvRows.push(Object.values(row).map(v => `"${String(v).replace(/"/g, '""')}"`).join(','));
+                      });
+                      const csv = csvRows.join('\n');
+                      const blob = new Blob([csv], { type: 'text/csv' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'subscribers.csv';
+                      a.click();
+                      URL.revokeObjectURL(url);
+                    } catch (e) {
+                      console.error('Export failed', e);
+                      toast({ title: 'Export failed', description: e.message, variant: 'destructive' });
+                    }
+                  }}>Export CSV</Button>
+                </div>
+
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Plan</TableHead>
+                      <TableHead>Tenant</TableHead>
+                      <TableHead>Subscribed</TableHead>
+                      <TableHead>Unsubscribed</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {subscribers.map((s) => (
+                      <TableRow key={s.id}>
+                        <TableCell className="font-medium">{s.email}</TableCell>
+                        <TableCell>{s.plan}</TableCell>
+                        <TableCell>{s.tenant_id || '-'}</TableCell>
+                        <TableCell>{s.subscribed_at ? new Date(s.subscribed_at).toLocaleString() : '-'}</TableCell>
+                        <TableCell>{s.unsubscribed ? `Yes (${s.unsubscribed_at ? new Date(s.unsubscribed_at).toLocaleString() : ''})` : 'No'}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="outline" onClick={async () => {
+                              try {
+                                // call unsubscribe function
+                                const fnBase = ((import.meta as any).env.VITE_SUPABASE_FUNCTIONS_URL || '').trim() || '';
+                                const url = fnBase ? `${fnBase.replace(/\/$/, '')}/newsletter-unsubscribe` : '/newsletter-unsubscribe';
+                                const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: s.unsubscribe_token, email: s.email }) });
+                                if (!res.ok) throw new Error('Unsubscribe failed');
+                                // update local state
+                                setSubscribers(prev => prev.map(p => p.id === s.id ? { ...p, unsubscribed: true, unsubscribed_at: new Date().toISOString() } : p));
+                                toast({ title: 'Unsubscribed', description: `${s.email} unsubscribed.` });
+                              } catch (e:any) {
+                                console.error('Unsubscribe error', e);
+                                toast({ title: 'Error', description: e.message || 'Failed to unsubscribe', variant: 'destructive' });
+                              }
+                            }}>Unsubscribe</Button>
+
+                            <Button onClick={() => {
+                              // open mailto for quick contact
+                              window.location.href = `mailto:${s.email}?subject=Newsletter&body=Hello`;
+                            }}>Contact</Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}

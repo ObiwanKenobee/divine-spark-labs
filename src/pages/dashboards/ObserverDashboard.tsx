@@ -1,8 +1,20 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, BookOpen, Video, MessageCircle, Calendar, Bell } from "lucide-react";
+import { Eye, BookOpen, Video, MessageCircle, Calendar, Bell, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 export const ObserverDashboard = () => {
+  const [lastSpark, setLastSpark] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const trigger = (label: string, cb?: () => void) => {
+    setLastSpark(label);
+    toast({ title: label, description: 'Opened ' + label });
+    if (cb) cb();
+    setTimeout(() => setLastSpark(null), 900);
+  };
+
   return (
     <>
       <div className="mb-12 animate-fade-in">
@@ -22,8 +34,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Follow ongoing initiatives</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              View Updates
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Project Updates')}>
+              <span className="flex items-center justify-center gap-2 w-full">View Updates{lastSpark === 'Project Updates' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
@@ -35,8 +47,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Educational materials</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              Browse Library
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Resources', () => window.location.href = '/') }>
+              <span className="flex items-center justify-center gap-2 w-full">Browse Library{lastSpark === 'Resources' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
@@ -48,8 +60,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Watch recorded sessions</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              View Videos
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Webinars')}>
+              <span className="flex items-center justify-center gap-2 w-full">View Videos{lastSpark === 'Webinars' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
@@ -61,8 +73,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Join discussions</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              Join Forum
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Community', () => window.open('https://community.example.com', '_blank'))}>
+              <span className="flex items-center justify-center gap-2 w-full">Join Forum{lastSpark === 'Community' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
@@ -74,8 +86,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Upcoming activities</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              View Calendar
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Events')}>
+              <span className="flex items-center justify-center gap-2 w-full">View Calendar{lastSpark === 'Events' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
@@ -87,8 +99,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Stay up to date</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              View Alerts
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Notifications')}>
+              <span className="flex items-center justify-center gap-2 w-full">View Alerts{lastSpark === 'Notifications' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
