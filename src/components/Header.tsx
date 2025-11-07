@@ -131,10 +131,10 @@ export default function Header() {
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
                     <DropdownMenu.Content sideOffset={6} align="end" className="absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg p-2">
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.href = '/auth?provider=google')}>Sign in with Google</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.href = '/auth')}>Sign in with Email</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/auth?provider=google')}>Sign in with Google</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/auth')}>Sign in with Email</DropdownMenu.Item>
                       <DropdownMenu.Separator className="my-1" />
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => (window.location.href = '/onboarding')}>Create Account</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/onboarding')}>Create Account</DropdownMenu.Item>
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
