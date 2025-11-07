@@ -20,7 +20,10 @@ serve(async (req) => {
     // normalize
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Try to insert into newsletter_subscribers table via Supabase REST API
+    // Generate unsubscribe token
+    const unsubscribe_token = crypto.randomUUID ? crypto.randomUUID() : (Math.random().toString(36).slice(2) + Date.now().toString(36));
+
+    // Try to insert into newsletter_subscribers table via Supabase REST API (include unsubscribe_token)
     let inserted = null;
     if (SUPABASE_URL && SUPABASE_SERVICE_ROLE) {
       try {
@@ -32,7 +35,7 @@ serve(async (req) => {
             'Content-Type': 'application/json',
             Prefer: 'return=representation',
           },
-          body: JSON.stringify({ email: normalizedEmail, tenant_id: tenantId || null, plan: plan || null, name: name || null, subscribed_at: new Date().toISOString() }),
+          body: JSON.stringify({ email: normalizedEmail, tenant_id: tenantId || null, plan: plan || null, name: name || null, subscribed_at: new Date().toISOString(), unsubscribe_token }),
         });
 
         if (res.ok) {
@@ -46,7 +49,7 @@ serve(async (req) => {
       }
     }
 
-    // If table not available, write to audit_logs as fallback
+    // If table not available, write to audit_logs as fallback (include unsubscribe token in metadata)
     if (!inserted && SUPABASE_URL && SUPABASE_SERVICE_ROLE) {
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/audit_logs`, {
@@ -57,27 +60,38 @@ serve(async (req) => {
             'Content-Type': 'application/json',
             Prefer: 'return=representation',
           },
-          body: JSON.stringify([{ action: 'newsletter_subscribe', created_at: new Date().toISOString(), ip_address: null, metadata: { email: normalizedEmail, tenantId, plan, name }, resource_id: null, resource_type: 'newsletter', user_id: null }]),
+          body: JSON.stringify([{ action: 'newsletter_subscribe', created_at: new Date().toISOString(), ip_address: null, metadata: { email: normalizedEmail, tenantId, plan, name, unsubscribe_token }, resource_id: null, resource_type: 'newsletter', user_id: null }]),
         });
       } catch (e) {
         console.warn('Failed to write audit log fallback', e.message);
       }
     }
 
+    // Build unsubscribe URL
+    const siteUrl = Deno.env.get('SITE_URL') || Deno.env.get('VITE_SITE_URL') || '';
+    const unsubscribeUrl = siteUrl ? `${siteUrl.replace(/\/$/, '')}/unsubscribe?token=${unsubscribe_token}` : `https://example.com/unsubscribe?token=${unsubscribe_token}`;
+
     // Send confirmation email via SendGrid (if configured)
     if (SENDGRID_API_KEY) {
       try {
+        const templateId = Deno.env.get('SENDGRID_TEMPLATE_ID');
+        const mailBody: any = templateId ? {
+          personalizations: [{ to: [{ email: normalizedEmail }], dynamic_template_data: { plan: plan || null, unsubscribe_url: unsubscribeUrl } }],
+          template_id: templateId,
+          from: { email: 'no-reply@joseph-marie.org', name: 'The Joseph-Marie Foundation' },
+        } : {
+          personalizations: [{ to: [{ email: normalizedEmail }], subject: 'Thanks for subscribing to The Joseph-Marie Foundation' }],
+          content: [{ type: 'text/plain', value: `Thank you for subscribing to our newsletter.${plan ? `\nPlan: ${plan}` : ''}\n\nTo unsubscribe: ${unsubscribeUrl}` }],
+          from: { email: 'no-reply@joseph-marie.org', name: 'The Joseph-Marie Foundation' },
+        };
+
         const sgRes = await fetch('https://api.sendgrid.com/v3/mail/send', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${SENDGRID_API_KEY}`,
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            personalizations: [{ to: [{ email: normalizedEmail }], subject: 'Thanks for subscribing to The Joseph-Marie Foundation' }],
-            content: [{ type: 'text/plain', value: `Thank you for subscribing to our newsletter.${plan ? `\nPlan: ${plan}` : ''}` }],
-            from: { email: 'no-reply@joseph-marie.org', name: 'The Joseph-Marie Foundation' },
-          }),
+          body: JSON.stringify(mailBody),
         });
 
         if (!sgRes.ok) {
