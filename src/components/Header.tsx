@@ -71,7 +71,7 @@ export default function Header() {
             </form>
           </div>
 
-          <nav className="hidden lg:flex lg:items-center lg:space-x-6" aria-label="Primary">
+          <nav className="hidden md:flex md:items-center md:space-x-6" aria-label="Primary">
             <a href="#platform" className="text-sm font-medium text-slate-700 hover:text-slate-900">Platform</a>
             <a href="#impact" className="text-sm font-medium text-slate-700 hover:text-slate-900">Impact</a>
             <a href="#ethics" className="text-sm font-medium text-slate-700 hover:text-slate-900">Ethics</a>
