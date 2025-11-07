@@ -12,6 +12,7 @@ import { DonorDashboard } from "./dashboards/DonorDashboard";
 import { AdminDashboard } from "./dashboards/AdminDashboard";
 import { InstitutionalDashboard } from "./dashboards/InstitutionalDashboard";
 import { ObserverDashboard } from "./dashboards/ObserverDashboard";
+import OpenAccessSanctumDashboard from "./dashboards/OpenAccessSanctumDashboard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
