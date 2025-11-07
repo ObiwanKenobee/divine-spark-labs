@@ -71,10 +71,10 @@ export default function Header() {
           </div>
 
           <nav className="hidden md:flex md:items-center md:space-x-6" aria-label="Primary">
-            <a href="#platform" className="text-sm font-medium text-slate-700 hover:text-slate-900">Platform</a>
-            <a href="#impact" className="text-sm font-medium text-slate-700 hover:text-slate-900">Impact</a>
-            <a href="#ethics" className="text-sm font-medium text-slate-700 hover:text-slate-900">Ethics</a>
-            <a href="#community" className="text-sm font-medium text-slate-700 hover:text-slate-900">Community</a>
+            <button onClick={() => navigate('/platform')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Platform</button>
+            <button onClick={() => navigate('/impact')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Impact</button>
+            <button onClick={() => navigate('/ethics')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Ethics</button>
+            <button onClick={() => navigate('/community')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Community</button>
 
             <div className="relative">
               <div className="inline-block text-left">
