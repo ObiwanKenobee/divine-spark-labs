@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [tenantPlan, setTenantPlan] = useState<string | null>(null);
   const { isAdmin } = useUserRole();
 
   useEffect(() => {
