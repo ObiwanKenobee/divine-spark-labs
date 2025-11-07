@@ -101,8 +101,8 @@ export default function Header() {
 
           <div className="flex items-center gap-3">
             <div className="hidden sm:flex items-center gap-2">
-              <Button variant="ghost" size="sm" onClick={() => (window.location.href = '/enterprise')}>Enterprise</Button>
-              <Button variant="ghost" size="sm" onClick={() => (window.location.href = '/pricing')}>Pricing</Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/enterprise')}>Enterprise</Button>
+              <Button variant="ghost" size="sm" onClick={() => navigate('/pricing')}>Pricing</Button>
             </div>
 
             <div className="flex items-center gap-2">
