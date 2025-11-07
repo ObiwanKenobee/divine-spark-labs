@@ -87,7 +87,7 @@ export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | n
             <CardDescription>Explore the foundational principles guiding our mission</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full" onClick={() => navigate('/')}>View Core Pillars</Button>
+            <Button variant="outline" className="w-full" onClick={() => trigger('Core Pillars', () => navigate('/'))}><span className="flex items-center justify-center gap-2 w-full">View Core Pillars{lastSpark === 'Core Pillars' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span></Button>
           </CardContent>
         </Card>
 
