@@ -60,8 +60,8 @@ export const ObserverDashboard = () => {
             <CardDescription>Watch recorded sessions</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              View Videos
+            <Button variant="outline" className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300" onClick={() => trigger('Webinars')}>
+              <span className="flex items-center justify-center gap-2 w-full">View Videos{lastSpark === 'Webinars' && <span className="spark-anim"><Sparkles className="w-4 h-4 text-primary" /></span>}</span>
             </Button>
           </CardContent>
         </Card>
