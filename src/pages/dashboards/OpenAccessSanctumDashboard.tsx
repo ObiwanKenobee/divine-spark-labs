@@ -21,25 +21,42 @@ export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | n
 
     setLoading(true);
     try {
-      // Prototype: record subscription in audit_logs for later export
-      const { error } = await supabase.from('audit_logs').insert([
-        {
-          action: 'newsletter_subscribe',
-          created_at: new Date().toISOString(),
-          ip_address: null,
-          metadata: { email, tenantId },
-          resource_id: null,
-          resource_type: 'newsletter',
-          user_id: null,
-        }
-      ]);
+      // Call serverless function to store subscriber and send confirmation email
+      const fnBase = ((import.meta as any).env.VITE_SUPABASE_FUNCTIONS_URL || '').trim() || '';
+      const url = fnBase ? `${fnBase.replace(/\/$/, '')}/newsletter-subscribe` : '/newsletter-subscribe';
 
-      if (error) throw error;
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, tenantId, plan: 'sanctum' }),
+      });
+
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`Subscription failed: ${res.status} ${txt}`);
+      }
 
       toast({ title: "Subscribed", description: "Thanks for subscribing to our newsletter." });
       setEmail("");
     } catch (err: any) {
       console.error("Subscribe error", err);
+      // Fallback: try to write to audit_logs directly
+      try {
+        await supabase.from('audit_logs').insert([
+          {
+            action: 'newsletter_subscribe_fallback',
+            created_at: new Date().toISOString(),
+            ip_address: null,
+            metadata: { email, tenantId },
+            resource_id: null,
+            resource_type: 'newsletter',
+            user_id: null,
+          }
+        ]);
+      } catch (e) {
+        console.warn('Fallback audit log failed', e);
+      }
+
       toast({ title: "Subscription failed", description: err.message || "Try again later.", variant: "destructive" });
     } finally {
       setLoading(false);
