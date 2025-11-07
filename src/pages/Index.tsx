@@ -10,6 +10,7 @@ import FAQ from "@/components/FAQ";
 import CTA from "@/components/CTA";
 import Footer from "@/components/Footer";
 import AIChat from "@/components/AIChat";
+import ResearchAssistant from "@/components/ResearchAssistant";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -60,6 +61,7 @@ const Index = () => {
       <CTA />
       <Footer />
       <AIChat />
+      <ResearchAssistant />
     </div>
   );
 };
