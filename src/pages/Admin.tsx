@@ -39,7 +39,7 @@ const Admin = () => {
         const { data: profilesData } = await supabase
           .from('profiles')
           .select('*, user_roles(role)');
-        
+
         setUsers(profilesData || []);
 
         // Fetch audit logs
@@ -48,15 +48,24 @@ const Admin = () => {
           .select('*')
           .order('created_at', { ascending: false })
           .limit(50);
-        
+
         setAuditLogs(logsData || []);
 
         // Fetch organizations
         const { data: orgsData } = await supabase
           .from('organizations')
           .select('*, organization_members(count)');
-        
+
         setOrganizations(orgsData || []);
+
+        // Fetch subscribers
+        const { data: subsData } = await supabase
+          .from('newsletter_subscribers')
+          .select('*')
+          .order('subscribed_at', { ascending: false })
+          .limit(1000);
+
+        setSubscribers(subsData || []);
       } catch (error: any) {
         toast({
           title: "Error loading admin data",
