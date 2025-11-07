@@ -144,6 +144,18 @@ const Auth = () => {
   };
 
   useEffect(() => {
+    // If redirected after payment, store status for UI
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const paid = params.get('paid') || params.get('status');
+      if (paid) {
+        const paidLabel = (paid === 'true' || paid === 'success' || paid === 'paid') ? 'success' : paid;
+        localStorage.setItem('lastPaymentStatus', paidLabel);
+      }
+    } catch (e) {
+      console.warn('Could not parse payment status from URL', e);
+    }
+
     const handlePostAuth = async (activeSession: Session) => {
       const pendingPlan = getPendingPlan();
       if (pendingPlan) {
