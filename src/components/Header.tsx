@@ -82,16 +82,9 @@ export default function Header() {
               <div>
                 {/* Using native Radix DropdownMenu gives arrow-key navigation and focus management */}
                 <div className="inline-block text-left">
-                  <div>
-                    <button onClick={() => setOpen((s) => !s)} id="solutionsMenuBtn" aria-haspopup="true" aria-expanded={open} className="text-sm font-medium text-slate-700 hover:text-slate-900 flex items-center gap-2">
-                      Solutions
-                      <svg className="w-3 h-3 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.24 8.27a.75.75 0 01-.01-1.06z" clipRule="evenodd"/></svg>
-                    </button>
-                  </div>
-
                   <DropdownMenu.Root>
                     <DropdownMenu.Trigger asChild>
-                      <button id="solutionsMenuBtn" className="text-sm font-medium text-slate-700 hover:text-slate-900 flex items-center gap-2">
+                      <button id="solutionsMenuBtn" aria-haspopup="true" className="text-sm font-medium text-slate-700 hover:text-slate-900 flex items-center gap-2">
                         Solutions
                         <svg className="w-3 h-3 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.24 8.27a.75.75 0 01-.01-1.06z" clipRule="evenodd"/></svg>
                       </button>
