@@ -129,10 +129,6 @@ export default function Header() {
                 </select>
               </div>
 
-              <div className="hidden sm:flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => startSSO('google') }><LogIn className="mr-2" />Sign in</Button>
-              </div>
-
               <div className="ml-2">
                 <Button variant="outline" size="sm" onClick={() => (window.location.href = '/auth')}>Sign In</Button>
               </div>
