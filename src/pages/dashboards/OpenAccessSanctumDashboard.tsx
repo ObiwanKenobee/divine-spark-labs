@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { BookOpen, Users, MessageCircle, Mail, Globe } from "lucide-react";
+import { BookOpen, Users, MessageCircle, Mail, Globe, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | null }) => {
@@ -11,6 +12,14 @@ export const OpenAccessSanctumDashboard = ({ tenantId }: { tenantId?: string | n
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lastSpark, setLastSpark] = useState<string | null>(null);
+
+  const trigger = (label: string, cb?: () => void) => {
+    setLastSpark(label);
+    toast({ title: label, description: `Opening ${label}` });
+    if (cb) cb();
+    setTimeout(() => setLastSpark(null), 900);
+  };
 
   const subscribeNewsletter = async (e: React.FormEvent) => {
     e.preventDefault();
