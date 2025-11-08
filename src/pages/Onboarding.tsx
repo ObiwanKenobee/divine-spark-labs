@@ -107,6 +107,19 @@ export default function Onboarding() {
         role: "owner"
       });
 
+      // Audit log: tenant created via onboarding
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: tenant.id,
+          actor_id: user.id,
+          action: 'tenant.created.via_onboarding',
+          meta: JSON.stringify({ tenantName, dataResidency }),
+          created_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Failed to write audit log for tenant creation in onboarding', e);
+      }
+
       // Update profile
       await supabase
         .from("profiles")
@@ -115,7 +128,7 @@ export default function Onboarding() {
 
       await saveProgress(2);
       setCurrentStep(2);
-      
+
       toast({
         title: "Organization Created",
         description: "Your organization has been set up successfully"
