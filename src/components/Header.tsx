@@ -190,6 +190,20 @@ export default function Header() {
             <button onClick={() => { navigate('/ethics'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Ethics</button>
             <button onClick={() => { navigate('/community'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Community</button>
             <div className="border-t pt-2 mt-2">
+              <div className="text-xs uppercase text-slate-500 px-3 mb-1">Explore</div>
+              <button onClick={() => { navigate('/about'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">About</button>
+              <button onClick={() => { navigate('/mission'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Mission & Governance</button>
+              <button onClick={() => { navigate('/women'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Women’s Empowerment</button>
+              <button onClick={() => { navigate('/labs'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Age‑Group Labs</button>
+              <button onClick={() => { navigate('/mentorship'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Mentorship & Collaboration</button>
+              <button onClick={() => { navigate('/innovation'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Innovation Cloud</button>
+              <button onClick={() => { navigate('/learning'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Learning & Research</button>
+              <button onClick={() => { navigate('/faith'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Faith & Philosophy</button>
+              <button onClick={() => { navigate('/partnerships'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Partnerships & Investment</button>
+              <button onClick={() => { navigate('/legal'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Legal & Transparency</button>
+            </div>
+            <div className="border-t pt-2 mt-2">
+              <div className="text-xs uppercase text-slate-500 px-3 mb-1">Solutions</div>
               <button onClick={() => { navigate('/solutions#discernment-api'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Discernment API</button>
               <button onClick={() => { navigate('/solutions#wisdomgraph'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Wisdom Graph</button>
               <button onClick={() => { navigate('/solutions#impact-cloud'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Impact Cloud</button>
