@@ -45,7 +45,7 @@ serve(async (req) => {
           console.warn('Newsletter insert failed, falling back to audit_logs', res.status, txt);
         }
       } catch (e) {
-        console.warn('Newsletter insert error, falling back to audit_logs', e.message);
+        console.warn('Newsletter insert error, falling back to audit_logs', e instanceof Error ? e.message : 'Unknown error');
       }
     }
 
@@ -63,7 +63,7 @@ serve(async (req) => {
           body: JSON.stringify([{ action: 'newsletter_subscribe', created_at: new Date().toISOString(), ip_address: null, metadata: { email: normalizedEmail, tenantId, plan, name, unsubscribe_token }, resource_id: null, resource_type: 'newsletter', user_id: null }]),
         });
       } catch (e) {
-        console.warn('Failed to write audit log fallback', e.message);
+        console.warn('Failed to write audit log fallback', e instanceof Error ? e.message : 'Unknown error');
       }
     }
 
@@ -99,7 +99,7 @@ serve(async (req) => {
           console.warn('SendGrid warning', sgRes.status, txt);
         }
       } catch (e) {
-        console.warn('SendGrid send error', e.message);
+        console.warn('SendGrid send error', e instanceof Error ? e.message : 'Unknown error');
       }
     }
 

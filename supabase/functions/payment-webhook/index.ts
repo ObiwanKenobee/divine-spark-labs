@@ -150,7 +150,7 @@ serve(async (req) => {
         return new Response(JSON.stringify({ status: 'provisioned' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       } catch (e) {
         console.error('Provisioning failure', e);
-        return new Response(JSON.stringify({ status: 'error', error: e.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ status: 'error', error: e instanceof Error ? e.message : 'Unknown error' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
     }
 
@@ -182,7 +182,7 @@ serve(async (req) => {
         return new Response(JSON.stringify({ status: 'tenant_created' }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       } catch (e) {
         console.error('Failed to create tenant for email', e);
-        return new Response(JSON.stringify({ status: 'error', error: e.message }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ status: 'error', error: e instanceof Error ? e.message : 'Unknown error' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
     }
 
