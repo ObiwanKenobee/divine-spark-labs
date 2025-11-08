@@ -85,6 +85,7 @@ const App = () => (
           <Route path="/header-demo" element={<HeaderDemo />} />
           <Route path="/footer-demo" element={<FooterDemo />} />
           <Route path="/deployments" element={<Deployments />} />
+          <Route path="/ai-backlink" element={<AiBacklink />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
