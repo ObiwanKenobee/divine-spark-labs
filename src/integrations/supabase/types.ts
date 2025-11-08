@@ -149,6 +149,167 @@ export type Database = {
         }
         Relationships: []
       }
+      fellowship_applications: {
+        Row: {
+          applicant_name: string
+          created_at: string
+          email: string
+          experience: string | null
+          fellowship_id: string
+          goals: string | null
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          user_id: string
+          why_apply: string
+        }
+        Insert: {
+          applicant_name: string
+          created_at?: string
+          email: string
+          experience?: string | null
+          fellowship_id: string
+          goals?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          user_id: string
+          why_apply: string
+        }
+        Update: {
+          applicant_name?: string
+          created_at?: string
+          email?: string
+          experience?: string | null
+          fellowship_id?: string
+          goals?: string | null
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          user_id?: string
+          why_apply?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fellowship_applications_fellowship_id_fkey"
+            columns: ["fellowship_id"]
+            isOneToOne: false
+            referencedRelation: "fellowships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fellowships: {
+        Row: {
+          cohort_size: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          metadata: Json | null
+          program_type: string
+          requirements: string | null
+          start_date: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cohort_size?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          metadata?: Json | null
+          program_type: string
+          requirements?: string | null
+          start_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cohort_size?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          metadata?: Json | null
+          program_type?: string
+          requirements?: string | null
+          start_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      investment_opportunities: {
+        Row: {
+          created_at: string
+          currency: string | null
+          deadline: string | null
+          description: string
+          founder_id: string | null
+          founder_name: string
+          funding_goal: number | null
+          funding_raised: number | null
+          id: string
+          impact_metrics: Json | null
+          location: string | null
+          project_name: string
+          sector: string
+          stage: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          deadline?: string | null
+          description: string
+          founder_id?: string | null
+          founder_name: string
+          funding_goal?: number | null
+          funding_raised?: number | null
+          id?: string
+          impact_metrics?: Json | null
+          location?: string | null
+          project_name: string
+          sector: string
+          stage: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          deadline?: string | null
+          description?: string
+          founder_id?: string | null
+          founder_name?: string
+          funding_goal?: number | null
+          funding_raised?: number | null
+          id?: string
+          impact_metrics?: Json | null
+          location?: string | null
+          project_name?: string
+          sector?: string
+          stage?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
@@ -479,6 +640,48 @@ export type Database = {
         }
         Relationships: []
       }
+      transformation_journal: {
+        Row: {
+          content: string
+          created_at: string
+          entry_type: string
+          id: string
+          is_private: boolean | null
+          milestone_date: string | null
+          mood: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          entry_type?: string
+          id?: string
+          is_private?: boolean | null
+          milestone_date?: string | null
+          mood?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          entry_type?: string
+          id?: string
+          is_private?: boolean | null
+          milestone_date?: string | null
+          mood?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -497,6 +700,72 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      women_pioneers: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          contact_email: string | null
+          country: string
+          created_at: string
+          created_by: string | null
+          focus_areas: string[] | null
+          id: string
+          is_verified: boolean | null
+          lat: number | null
+          linkedin_url: string | null
+          lng: number | null
+          name: string
+          projects: string[] | null
+          region: string
+          title: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          contact_email?: string | null
+          country: string
+          created_at?: string
+          created_by?: string | null
+          focus_areas?: string[] | null
+          id?: string
+          is_verified?: boolean | null
+          lat?: number | null
+          linkedin_url?: string | null
+          lng?: number | null
+          name: string
+          projects?: string[] | null
+          region: string
+          title?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          contact_email?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          focus_areas?: string[] | null
+          id?: string
+          is_verified?: boolean | null
+          lat?: number | null
+          linkedin_url?: string | null
+          lng?: number | null
+          name?: string
+          projects?: string[] | null
+          region?: string
+          title?: string | null
+          updated_at?: string
+          website_url?: string | null
         }
         Relationships: []
       }
