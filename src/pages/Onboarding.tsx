@@ -262,12 +262,26 @@ export default function Onboarding() {
 
       if (error) throw error;
 
+      // Audit log: workspace provisioned via onboarding
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: profile?.tenant_id,
+          workspace_id: data?.workspaceId || null,
+          actor_id: user.id,
+          action: 'workspace.provisioned.via_onboarding',
+          meta: JSON.stringify({ name: workspaceName }),
+          created_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Failed to write audit log for workspace provisioning in onboarding', e);
+      }
+
       // Mark onboarding as complete
       await supabase
         .from("profiles")
-        .update({ 
+        .update({
           onboarding_completed: true,
-          onboarding_step: 4 
+          onboarding_step: 4
         })
         .eq("user_id", user.id);
 
