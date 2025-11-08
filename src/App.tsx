@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import AutoReloader from "@/components/AutoReloader";
 import NotFound from "./pages/NotFound";
 import Pricing from "./pages/Pricing";
 import Auth from "./pages/Auth";
@@ -13,6 +14,7 @@ import Organizations from "./pages/Organizations";
 import Enterprise from "./pages/Enterprise";
 import Onboarding from "./pages/Onboarding";
 import Workspaces from "./pages/Workspaces";
+import WorkspaceDetail from "./pages/WorkspaceDetail";
 import PaymentStatus from "./pages/PaymentStatus";
 import HeaderDemo from "./pages/HeaderDemo";
 import FooterDemo from "./pages/FooterDemo";
@@ -36,6 +38,8 @@ import Explore from "./pages/Explore";
 import Forums from "./pages/Forums";
 import Events from "./pages/Events";
 import Programs from "./pages/Programs";
+import AiBacklink from "./pages/AiBacklink";
+import Deployments from "./pages/Deployments";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +48,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <AutoReloader />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -53,6 +58,7 @@ const App = () => (
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/workspaces" element={<Workspaces />} />
+          <Route path="/workspaces/:id" element={<WorkspaceDetail />} />
           <Route path="/payment/status" element={<PaymentStatus />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/organizations" element={<Organizations />} />
@@ -78,6 +84,8 @@ const App = () => (
           <Route path="/explore" element={<Explore />} />
           <Route path="/header-demo" element={<HeaderDemo />} />
           <Route path="/footer-demo" element={<FooterDemo />} />
+          <Route path="/deployments" element={<Deployments />} />
+          <Route path="/ai-backlink" element={<AiBacklink />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

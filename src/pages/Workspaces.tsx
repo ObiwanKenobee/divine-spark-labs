@@ -252,7 +252,7 @@ export default function Workspaces() {
                 </div>
               </div>
               
-              <Button className="w-full mt-4" variant="outline">
+              <Button className="w-full mt-4" variant="outline" onClick={() => navigate(`/workspaces/${workspace.id}`)}>
                 Open Workspace
               </Button>
             </Card>
