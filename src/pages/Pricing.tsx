@@ -61,6 +61,7 @@ const Pricing = () => {
         "Governance framework integration",
         "White-label moral design tools",
         "Admin workspace management",
+        "Dedicated enhanced authentication",
         "Enterprise SSO integration",
         "Compliance & audit logging"
       ]
