@@ -149,6 +149,50 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          plan: string | null
+          subscribed_at: string
+          tenant_id: string | null
+          unsubscribe_token: string | null
+          unsubscribed_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          plan?: string | null
+          subscribed_at?: string
+          tenant_id?: string | null
+          unsubscribe_token?: string | null
+          unsubscribed_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          plan?: string | null
+          subscribed_at?: string
+          tenant_id?: string | null
+          unsubscribe_token?: string | null
+          unsubscribed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_subscribers_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding_consents: {
         Row: {
           accepted: boolean | null
