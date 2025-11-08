@@ -35,6 +35,15 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [session, setSession] = useState<Session | null>(null);
 
+  // Optional enterprise onboarding fields collected at signup
+  const [enterpriseOnboard, setEnterpriseOnboard] = useState(false);
+  const [orgName, setOrgName] = useState("");
+  const [orgType, setOrgType] = useState("");
+  const [billingContact, setBillingContact] = useState("");
+  const [legalContact, setLegalContact] = useState("");
+  const [slaTier, setSlaTier] = useState("");
+  const [ssoRequested, setSsoRequested] = useState(false);
+
   const getPendingPlan = () => {
     const urlPlan = new URLSearchParams(window.location.search).get("plan");
     return urlPlan || localStorage.getItem("pendingPlan");
@@ -81,6 +90,19 @@ const Auth = () => {
       if (tenantError) throw tenantError;
       tenantId = tenant.id;
 
+      // Audit log: tenant created
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: tenantId,
+          actor_id: user.id,
+          action: 'tenant.created',
+          meta: JSON.stringify({ plan }),
+          created_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Failed to insert audit log for tenant creation', e);
+      }
+
       const { error: profileError } = await supabase
         .from("profiles")
         .upsert({ user_id: user.id, tenant_id: tenantId, onboarding_completed: true })
@@ -119,6 +141,20 @@ const Auth = () => {
         .single();
       if (wsError) throw wsError;
       workspaceId = ws.id;
+
+      // Audit log: workspace provisioned
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: tenantId,
+          workspace_id: workspaceId,
+          actor_id: user.id,
+          action: 'workspace.provisioned',
+          meta: JSON.stringify({ workspace: workspaceName }),
+          created_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Failed to insert audit log for workspace provisioning', e);
+      }
     }
 
     const { data: memberRows } = await supabase
@@ -133,11 +169,38 @@ const Auth = () => {
         .from("workspace_members")
         .insert({ workspace_id: workspaceId as string, user_id: user.id, role });
       if (addMemberErr) throw addMemberErr;
+
+      // Audit log: member added
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: tenantId,
+          workspace_id: workspaceId,
+          actor_id: user.id,
+          action: 'workspace.member_added',
+          meta: JSON.stringify({ role }),
+          created_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Failed to insert audit log for member addition', e);
+      }
     } else if (memberRows[0].role !== role) {
       await supabase
         .from("workspace_members")
         .update({ role })
         .eq("id", memberRows[0].id);
+
+      try {
+        await supabase.from('audit_logs').insert({
+          tenant_id: tenantId,
+          workspace_id: workspaceId,
+          actor_id: user.id,
+          action: 'workspace.member_role_updated',
+          meta: JSON.stringify({ from: memberRows[0].role, to: role }),
+          created_at: new Date().toISOString()
+        });
+      } catch (e) {
+        console.warn('Failed to insert audit log for member role update', e);
+      }
     }
 
     clearPendingPlan();
@@ -386,7 +449,7 @@ const Auth = () => {
 
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
+                      <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
                     <Input
                       id="signup-name"
@@ -397,6 +460,7 @@ const Auth = () => {
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
                     <Input
@@ -408,6 +472,7 @@ const Auth = () => {
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
                     <Input
@@ -420,6 +485,51 @@ const Auth = () => {
                       minLength={6}
                     />
                   </div>
+
+                  <div className="pt-2">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={enterpriseOnboard} onChange={(e) => setEnterpriseOnboard(e.target.checked)} />
+                      <span className="text-sm">Request enterprise onboarding / SSO</span>
+                    </label>
+                  </div>
+
+                  {enterpriseOnboard && (
+                    <div className="space-y-3 p-3 bg-muted/50 rounded border border-border">
+                      <div className="space-y-2">
+                        <Label htmlFor="orgName">Organization Name</Label>
+                        <Input id="orgName" value={orgName} onChange={(e) => setOrgName(e.target.value)} placeholder="Example University" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="orgType">Organization Type</Label>
+                        <Input id="orgType" value={orgType} onChange={(e) => setOrgType(e.target.value)} placeholder="Government / University / Faith Lab" />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label htmlFor="billingContact">Billing Contact Email</Label>
+                          <Input id="billingContact" value={billingContact} onChange={(e) => setBillingContact(e.target.value)} placeholder="billing@org.com" />
+                        </div>
+                        <div>
+                          <Label htmlFor="legalContact">Legal Contact Email</Label>
+                          <Input id="legalContact" value={legalContact} onChange={(e) => setLegalContact(e.target.value)} placeholder="legal@org.com" />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="slaTier">SLA Tier</Label>
+                        <Input id="slaTier" value={slaTier} onChange={(e) => setSlaTier(e.target.value)} placeholder="Gold / Platinum / Enterprise" />
+                      </div>
+
+                      <div className="pt-2">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input type="checkbox" checked={ssoRequested} onChange={(e) => setSsoRequested(e.target.checked)} />
+                          <span className="text-sm">I want to set up SAML / OIDC SSO for my organization</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Creating account..." : "Sign Up"}
                   </Button>
