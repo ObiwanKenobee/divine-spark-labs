@@ -23,6 +23,17 @@ const AIChat = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    const open = () => setIsOpen(true);
+    const close = () => setIsOpen(false);
+    window.addEventListener('open-ai-chat', open as EventListener);
+    window.addEventListener('close-ai-chat', close as EventListener);
+    return () => {
+      window.removeEventListener('open-ai-chat', open as EventListener);
+      window.removeEventListener('close-ai-chat', close as EventListener);
+    };
+  }, []);
+
   const streamChat = async (userMessage: string) => {
     const newMessages: Message[] = [...messages, { role: "user", content: userMessage }];
     setMessages(newMessages);
