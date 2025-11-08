@@ -145,8 +145,9 @@ const Dashboard = () => {
 
       <main className="container mx-auto px-4 py-16">
         {isAdmin && <AdminDashboard />}
+        {!isAdmin && tenantPlan === 'civilization' && <CivilizationDashboard />}
         {!isAdmin && tenantPlan === 'sanctum' && <OpenAccessSanctumDashboard />}
-        {!isAdmin && userRole === 'owner' && <InstitutionalDashboard />}
+        {!isAdmin && userRole === 'owner' && tenantPlan !== 'civilization' && <InstitutionalDashboard />}
         {!isAdmin && userRole === 'admin' && <InstitutionalDashboard />}
         {!isAdmin && userRole === 'lead' && <FellowDashboard />}
         {!isAdmin && userRole === 'fellow' && <FellowDashboard />}
