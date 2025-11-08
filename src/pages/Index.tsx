@@ -14,9 +14,29 @@ import AIChat from "@/components/AIChat";
 import ResearchAssistant from "@/components/ResearchAssistant";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import React, { Suspense, useEffect, useState } from "react";
+
+const NewsletterModal = React.lazy(() => import("@/components/NewsletterModal"));
 
 const Index = () => {
   const navigate = useNavigate();
+  const [showNewsletter, setShowNewsletter] = useState(false);
+
+  useEffect(() => {
+    try {
+      const subscribed = localStorage.getItem('jmf_newsletter_subscribed');
+      const shown = localStorage.getItem('jmf_newsletter_shown');
+      if (subscribed) return; // already subscribed
+      if (shown) return; // already shown this user
+      const t = setTimeout(() => {
+        setShowNewsletter(true);
+        localStorage.setItem('jmf_newsletter_shown', '1');
+      }, 3000);
+      return () => clearTimeout(t);
+    } catch (e) {
+      // ignore localStorage errors
+    }
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -34,6 +54,12 @@ const Index = () => {
       <Footer />
       <AIChat />
       <ResearchAssistant />
+
+      <Suspense fallback={null}>
+        {showNewsletter && (
+          <NewsletterModal open={showNewsletter} onClose={() => setShowNewsletter(false)} />
+        )}
+      </Suspense>
     </div>
   );
 };

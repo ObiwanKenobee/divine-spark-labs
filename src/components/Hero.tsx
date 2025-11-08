@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Map, Users, Handshake, GraduationCap, MessagesSquare } from "lucide-react";
 import heroImage from "@/assets/hero-divine-innovation.jpg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "@/components/Modal";
 import { useToast } from "@/hooks/use-toast";
 
@@ -9,6 +9,23 @@ const Hero = () => {
   const [open, setOpen] = useState(false);
   const [sparkKey, setSparkKey] = useState(0);
   const { toast } = useToast();
+  const [metric, setMetric] = useState(8.0);
+
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    const from = 8.0;
+    const to = 8.2;
+    const dur = 1800;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / dur);
+      const eased = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+      setMetric(from + (to - from) * eased);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
 
   const handleExplore = () => {
     // micro-interaction: small spark animation + toast + open modal
@@ -69,6 +86,37 @@ const Hero = () => {
             <Button variant="hero" size="lg" onClick={handleLearnMore}>
               Learn More
             </Button>
+            <Button variant="outline" size="lg" onClick={() => window.dispatchEvent(new Event('open-ai-chat'))}>
+              Meet Joseph‑Marie
+              <MessagesSquare className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+
+          <div className="mx-auto max-w-2xl">
+            <div className="mt-6 rounded-xl border bg-white/10 text-primary-foreground backdrop-blur-md p-4">
+              <div className="text-xs uppercase tracking-wide opacity-80">Live Metric</div>
+              <div className="text-2xl font-semibold">
+                {metric.toFixed(2)}B potential impact <span className="opacity-80">…and growing</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8">
+            <div className="text-sm uppercase tracking-wide text-primary-foreground/80 mb-3">Foundation Compass</div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <Button variant="outline" onClick={() => (window.location.href = '/labs#0-14')}>
+                <Map className="mr-2 h-4 w-4" /> Youth Path
+              </Button>
+              <Button variant="outline" onClick={() => (window.location.href = '/women')}>
+                <Users className="mr-2 h-4 w-4" /> Women Hub
+              </Button>
+              <Button variant="outline" onClick={() => (window.location.href = '/mentorship')}>
+                <Handshake className="mr-2 h-4 w-4" /> Mentors
+              </Button>
+              <Button variant="outline" onClick={() => (window.location.href = '/partnerships')}>
+                <GraduationCap className="mr-2 h-4 w-4" /> Partners
+              </Button>
+            </div>
           </div>
         </div>
       </div>

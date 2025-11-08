@@ -80,6 +80,34 @@ export default function Header() {
               <div className="inline-block text-left">
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
+                    <button id="exploreMenuBtn" aria-haspopup="true" className="text-sm font-medium text-slate-700 hover:text-slate-900 flex items-center gap-2">
+                      Explore
+                      <svg className="w-3 h-3 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.24 8.27a.75.75 0 01-.01-1.06z" clipRule="evenodd"/></svg>
+                    </button>
+                  </DropdownMenu.Trigger>
+
+                  <DropdownMenu.Portal>
+                    <DropdownMenu.Content sideOffset={8} align="end" className="absolute right-0 mt-3 w-80 bg-white border rounded-lg shadow-lg p-2">
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/about')}>About</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/mission')}>Mission & Governance</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/women')}>Women’s Empowerment</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/labs')}>Age‑Group Labs</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/mentorship')}>Mentorship & Collaboration</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/innovation')}>Innovation Cloud</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/learning')}>Learning & Research</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/faith')}>Faith & Philosophy</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/partnerships')}>Partnerships & Investment</DropdownMenu.Item>
+                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/legal')}>Legal & Transparency</DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu.Portal>
+                </DropdownMenu.Root>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="inline-block text-left">
+                <DropdownMenu.Root>
+                  <DropdownMenu.Trigger asChild>
                     <button id="solutionsMenuBtn" aria-haspopup="true" className="text-sm font-medium text-slate-700 hover:text-slate-900 flex items-center gap-2">
                       Solutions
                       <svg className="w-3 h-3 text-slate-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.24 8.27a.75.75 0 01-.01-1.06z" clipRule="evenodd"/></svg>
@@ -162,6 +190,20 @@ export default function Header() {
             <button onClick={() => { navigate('/ethics'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Ethics</button>
             <button onClick={() => { navigate('/community'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Community</button>
             <div className="border-t pt-2 mt-2">
+              <div className="text-xs uppercase text-slate-500 px-3 mb-1">Explore</div>
+              <button onClick={() => { navigate('/about'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">About</button>
+              <button onClick={() => { navigate('/mission'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Mission & Governance</button>
+              <button onClick={() => { navigate('/women'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Women’s Empowerment</button>
+              <button onClick={() => { navigate('/labs'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Age‑Group Labs</button>
+              <button onClick={() => { navigate('/mentorship'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Mentorship & Collaboration</button>
+              <button onClick={() => { navigate('/innovation'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Innovation Cloud</button>
+              <button onClick={() => { navigate('/learning'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Learning & Research</button>
+              <button onClick={() => { navigate('/faith'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Faith & Philosophy</button>
+              <button onClick={() => { navigate('/partnerships'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Partnerships & Investment</button>
+              <button onClick={() => { navigate('/legal'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Legal & Transparency</button>
+            </div>
+            <div className="border-t pt-2 mt-2">
+              <div className="text-xs uppercase text-slate-500 px-3 mb-1">Solutions</div>
               <button onClick={() => { navigate('/solutions#discernment-api'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Discernment API</button>
               <button onClick={() => { navigate('/solutions#wisdomgraph'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Wisdom Graph</button>
               <button onClick={() => { navigate('/solutions#impact-cloud'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Impact Cloud</button>
