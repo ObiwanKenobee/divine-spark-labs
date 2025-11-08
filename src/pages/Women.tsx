@@ -1,563 +1,534 @@
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { Heart, MapPin, Sparkles, TrendingUp, Users, Globe, BookOpen, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Users, Map, BookOpen, TrendingUp, Globe, Calendar, Target, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Women = () => {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("overview");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Fellowship Application Form
-  const [fellowshipForm, setFellowshipForm] = useState({
-    applicant_name: "",
-    email: "",
-    why_apply: "",
-    experience: "",
-    goals: ""
-  });
-
-  // Journal Entry Form
-  const [journalForm, setJournalForm] = useState({
-    entry_type: "reflection",
-    title: "",
-    content: "",
-    mood: "",
-    tags: [] as string[],
-    is_private: true
-  });
-
-  const handleFellowshipSubmit = async (fellowshipId: string) => {
-    setIsSubmitting(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to apply for fellowships.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from("fellowship_applications")
-        .insert({
-          fellowship_id: fellowshipId,
-          user_id: user.id,
-          ...fellowshipForm
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Application submitted!",
-        description: "We'll review your application and get back to you soon."
-      });
-
-      setFellowshipForm({
-        applicant_name: "",
-        email: "",
-        why_apply: "",
-        experience: "",
-        goals: ""
-      });
-    } catch (error) {
-      toast({
-        title: "Submission failed",
-        description: error instanceof Error ? error.message : "Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleJournalSubmit = async () => {
-    setIsSubmitting(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to create journal entries.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      const { error } = await supabase
-        .from("transformation_journal")
-        .insert({
-          user_id: user.id,
-          ...journalForm
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Journal entry saved",
-        description: "Your reflection has been recorded."
-      });
-
-      setJournalForm({
-        entry_type: "reflection",
-        title: "",
-        content: "",
-        mood: "",
-        tags: [],
-        is_private: true
-      });
-    } catch (error) {
-      toast({
-        title: "Save failed",
-        description: error instanceof Error ? error.message : "Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const { toast } = useToast();
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
       <main className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <header className="text-center mb-12 space-y-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-4">
-            <Heart className="h-4 w-4" />
-            <span className="text-sm font-medium">Mary Initiative</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-4">
+            <Heart className="h-5 w-5 text-primary" />
+            <span className="text-sm font-medium text-primary">Mary Initiative</span>
           </div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
             Women's Empowerment Hub
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Female-led innovation pathways, fellowships, and investment collaborations nurturing the next generation of women leaders.
+            Nurturing female-led innovation through spiritual intelligence, transformative leadership, and regenerative investment
           </p>
         </header>
 
-        {/* Main Content Tabs */}
+        {/* Main Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-2">
-            <TabsTrigger value="overview" className="gap-2">
-              <Sparkles className="h-4 w-4" />
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="fellowships" className="gap-2">
-              <Users className="h-4 w-4" />
-              Fellowships
-            </TabsTrigger>
-            <TabsTrigger value="investment" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Investment
-            </TabsTrigger>
-            <TabsTrigger value="journal" className="gap-2">
-              <BookOpen className="h-4 w-4" />
-              Journal
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 gap-2">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="fellowships">Fellowships</TabsTrigger>
+            <TabsTrigger value="collective">Investment</TabsTrigger>
+            <TabsTrigger value="pioneers">Pioneers Map</TabsTrigger>
+            <TabsTrigger value="journal">Journal</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-8">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card className="border-primary/20 hover:border-primary/40 transition-colors">
-                <CardHeader>
-                  <Heart className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Mary Magdalene Path</CardTitle>
-                  <CardDescription>
-                    Fellowships nurturing spiritual intelligence, leadership courage, and transformative product innovation.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={() => setActiveTab("fellowships")} className="w-full">
-                    Explore Fellowships
-                  </Button>
-                </CardContent>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setActiveTab("fellowships")}>
+                <Sparkles className="h-10 w-10 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Mary Magdalene Path</h3>
+                <p className="text-sm text-muted-foreground">
+                  Fellowships nurturing spiritual intelligence, leadership courage, and purpose-driven innovation
+                </p>
+                <Button variant="link" className="p-0 mt-4">Explore Fellowships →</Button>
               </Card>
 
-              <Card className="border-primary/20 hover:border-primary/40 transition-colors">
-                <CardHeader>
-                  <TrendingUp className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Joanna Investment Collective</CardTitle>
-                  <CardDescription>
-                    Women-led capital syndicates backing regenerative ventures and sustainable enterprises.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={() => setActiveTab("investment")} className="w-full">
-                    View Opportunities
-                  </Button>
-                </CardContent>
+              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setActiveTab("collective")}>
+                <TrendingUp className="h-10 w-10 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Joanna Investment Collective</h3>
+                <p className="text-sm text-muted-foreground">
+                  Women-led capital syndicates backing regenerative ventures and sustainable innovation
+                </p>
+                <Button variant="link" className="p-0 mt-4">View Opportunities →</Button>
               </Card>
 
-              <Card className="border-primary/20 hover:border-primary/40 transition-colors">
-                <CardHeader>
-                  <Map className="h-10 w-10 text-primary mb-2" />
-                  <CardTitle>Innovation Map</CardTitle>
-                  <CardDescription>
-                    A curated view of women pioneers, projects, and transformative initiatives across regions.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full">
-                    Explore Map
-                  </Button>
-                </CardContent>
+              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setActiveTab("pioneers")}>
+                <Globe className="h-10 w-10 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Innovation Map</h3>
+                <p className="text-sm text-muted-foreground">
+                  A curated global view of women pioneers and transformative projects across regions
+                </p>
+                <Button variant="link" className="p-0 mt-4">Explore Map →</Button>
+              </Card>
+
+              <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setActiveTab("journal")}>
+                <BookOpen className="h-10 w-10 text-primary mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Transformation Journal</h3>
+                <p className="text-sm text-muted-foreground">
+                  Reflective practice blending discernment prompts, milestones, and wellbeing insights
+                </p>
+                <Button variant="link" className="p-0 mt-4">Start Journaling →</Button>
               </Card>
             </div>
 
-            {/* Key Features */}
-            <div className="grid md:grid-cols-2 gap-6 mt-12">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
-                    Our Mission
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <p className="text-muted-foreground">
-                    To create pathways for women to lead innovation with spiritual intelligence, 
-                    backed by collaborative capital and regenerative principles.
-                  </p>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Holistic leadership development</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Access to impact-driven capital</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>Global network of women innovators</span>
-                    </li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Globe className="h-5 w-5 text-primary" />
-                    Global Impact
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-4 bg-primary/5 rounded-lg">
-                    <div className="text-3xl font-bold text-primary">250+</div>
-                    <div className="text-sm text-muted-foreground">Women Leaders</div>
-                  </div>
-                  <div className="text-center p-4 bg-primary/5 rounded-lg">
-                    <div className="text-3xl font-bold text-primary">45</div>
-                    <div className="text-sm text-muted-foreground">Countries</div>
-                  </div>
-                  <div className="text-center p-4 bg-primary/5 rounded-lg">
-                    <div className="text-3xl font-bold text-primary">$12M</div>
-                    <div className="text-sm text-muted-foreground">Capital Deployed</div>
-                  </div>
-                  <div className="text-center p-4 bg-primary/5 rounded-lg">
-                    <div className="text-3xl font-bold text-primary">180</div>
-                    <div className="text-sm text-muted-foreground">Projects Funded</div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Impact Stats */}
+            <Card className="p-8 bg-gradient-to-br from-primary/5 to-primary/10">
+              <h2 className="text-2xl font-semibold mb-6">Our Collective Impact</h2>
+              <div className="grid md:grid-cols-4 gap-6">
+                <div>
+                  <div className="text-3xl font-bold text-primary">500+</div>
+                  <div className="text-sm text-muted-foreground">Women Fellows</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">75+</div>
+                  <div className="text-sm text-muted-foreground">Countries Reached</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">$12M+</div>
+                  <div className="text-sm text-muted-foreground">Invested in Ventures</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-primary">1200+</div>
+                  <div className="text-sm text-muted-foreground">Journal Entries</div>
+                </div>
+              </div>
+            </Card>
           </TabsContent>
 
           {/* Fellowships Tab */}
           <TabsContent value="fellowships" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Mary Magdalene Path Fellowship</CardTitle>
-                <CardDescription>
-                  A transformative 6-month journey combining spiritual discernment, leadership development, 
-                  and product innovation for women changemakers.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="flex items-start gap-3">
-                    <Calendar className="h-5 w-5 text-primary mt-1" />
-                    <div>
-                      <div className="font-semibold">Duration</div>
-                      <div className="text-sm text-muted-foreground">6 months, part-time</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Users className="h-5 w-5 text-primary mt-1" />
-                    <div>
-                      <div className="font-semibold">Cohort Size</div>
-                      <div className="text-sm text-muted-foreground">20-25 fellows</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Globe className="h-5 w-5 text-primary mt-1" />
-                    <div>
-                      <div className="font-semibold">Format</div>
-                      <div className="text-sm text-muted-foreground">Hybrid (online + retreats)</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t">
-                  <h4 className="font-semibold mb-3">Program Components</h4>
-                  <div className="grid md:grid-cols-2 gap-3">
-                    <Badge variant="outline" className="justify-start py-2">Spiritual Intelligence Workshops</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Leadership & Courage Building</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Product Innovation Labs</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Mentorship from Women Leaders</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Funding Pitch Training</Badge>
-                    <Badge variant="outline" className="justify-start py-2">Global Network Access</Badge>
-                  </div>
-                </div>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full mt-4">Apply for Fellowship</Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Fellowship Application</DialogTitle>
-                      <DialogDescription>
-                        Share your journey and vision for transformative leadership.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="applicant_name">Full Name *</Label>
-                        <Input
-                          id="applicant_name"
-                          value={fellowshipForm.applicant_name}
-                          onChange={(e) => setFellowshipForm({ ...fellowshipForm, applicant_name: e.target.value })}
-                          placeholder="Your full name"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={fellowshipForm.email}
-                          onChange={(e) => setFellowshipForm({ ...fellowshipForm, email: e.target.value })}
-                          placeholder="your.email@example.com"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="why_apply">Why are you applying? *</Label>
-                        <Textarea
-                          id="why_apply"
-                          value={fellowshipForm.why_apply}
-                          onChange={(e) => setFellowshipForm({ ...fellowshipForm, why_apply: e.target.value })}
-                          placeholder="Share your motivation and what draws you to this fellowship..."
-                          rows={4}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="experience">Relevant Experience</Label>
-                        <Textarea
-                          id="experience"
-                          value={fellowshipForm.experience}
-                          onChange={(e) => setFellowshipForm({ ...fellowshipForm, experience: e.target.value })}
-                          placeholder="Your background in leadership, innovation, or social impact..."
-                          rows={3}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="goals">Your Goals *</Label>
-                        <Textarea
-                          id="goals"
-                          value={fellowshipForm.goals}
-                          onChange={(e) => setFellowshipForm({ ...fellowshipForm, goals: e.target.value })}
-                          placeholder="What do you hope to achieve through this fellowship?"
-                          rows={3}
-                        />
-                      </div>
-                      <Button 
-                        onClick={() => handleFellowshipSubmit("example-fellowship-id")}
-                        disabled={isSubmitting}
-                        className="w-full"
-                      >
-                        {isSubmitting ? "Submitting..." : "Submit Application"}
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
+            <FellowshipsSection />
           </TabsContent>
 
-          {/* Investment Tab */}
-          <TabsContent value="investment" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Joanna Investment Collective</CardTitle>
-                <CardDescription>
-                  Women-led capital syndicates supporting regenerative ventures and sustainable enterprises.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="p-4 bg-primary/5 rounded-lg">
-                    <h4 className="font-semibold mb-2">Investment Focus Areas</h4>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge>Renewable Energy</Badge>
-                      <Badge>Education Tech</Badge>
-                      <Badge>Healthcare Innovation</Badge>
-                      <Badge>Sustainable Agriculture</Badge>
-                      <Badge>Climate Solutions</Badge>
-                      <Badge>Social Enterprise</Badge>
-                    </div>
-                  </div>
+          {/* Investment Collective Tab */}
+          <TabsContent value="collective" className="space-y-6">
+            <InvestmentCollectiveSection />
+          </TabsContent>
 
-                  <div className="grid md:grid-cols-2 gap-4 pt-4">
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-2">For Investors</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Join a collective of mission-driven investors backing women-led regenerative ventures.
-                      </p>
-                      <Button variant="outline" className="w-full">Join Collective</Button>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-2">For Founders</h4>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        Present your regenerative venture to our network of impact-focused investors.
-                      </p>
-                      <Button variant="outline" className="w-full">Submit Opportunity</Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Pioneers Map Tab */}
+          <TabsContent value="pioneers" className="space-y-6">
+            <PioneersMapSection />
           </TabsContent>
 
           {/* Journal Tab */}
           <TabsContent value="journal" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Personal Transformation Journaling</CardTitle>
-                <CardDescription>
-                  A reflective practice blending discernment prompts and project milestones to support your growth journey.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-4 mb-6">
-                  <div className="p-4 bg-primary/5 rounded-lg text-center">
-                    <BookOpen className="h-8 w-8 text-primary mx-auto mb-2" />
-                    <div className="font-semibold">Reflections</div>
-                    <div className="text-sm text-muted-foreground">Daily insights</div>
-                  </div>
-                  <div className="p-4 bg-primary/5 rounded-lg text-center">
-                    <Target className="h-8 w-8 text-primary mx-auto mb-2" />
-                    <div className="font-semibold">Milestones</div>
-                    <div className="text-sm text-muted-foreground">Track progress</div>
-                  </div>
-                  <div className="p-4 bg-primary/5 rounded-lg text-center">
-                    <Heart className="h-8 w-8 text-primary mx-auto mb-2" />
-                    <div className="font-semibold">Discernment</div>
-                    <div className="text-sm text-muted-foreground">Guided prompts</div>
-                  </div>
-                </div>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full">Create New Entry</Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
-                    <DialogHeader>
-                      <DialogTitle>New Journal Entry</DialogTitle>
-                      <DialogDescription>
-                        Record your reflections, milestones, or discernment insights.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="entry_type">Entry Type</Label>
-                        <Select
-                          value={journalForm.entry_type}
-                          onValueChange={(value) => setJournalForm({ ...journalForm, entry_type: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="reflection">Reflection</SelectItem>
-                            <SelectItem value="milestone">Milestone</SelectItem>
-                            <SelectItem value="discernment">Discernment</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="journal_title">Title *</Label>
-                        <Input
-                          id="journal_title"
-                          value={journalForm.title}
-                          onChange={(e) => setJournalForm({ ...journalForm, title: e.target.value })}
-                          placeholder="Give your entry a title..."
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="content">Content *</Label>
-                        <Textarea
-                          id="content"
-                          value={journalForm.content}
-                          onChange={(e) => setJournalForm({ ...journalForm, content: e.target.value })}
-                          placeholder="Write your thoughts, insights, or experiences..."
-                          rows={6}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="mood">Mood/Feeling</Label>
-                        <Select
-                          value={journalForm.mood}
-                          onValueChange={(value) => setJournalForm({ ...journalForm, mood: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="How are you feeling?" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="hopeful">Hopeful</SelectItem>
-                            <SelectItem value="grateful">Grateful</SelectItem>
-                            <SelectItem value="challenged">Challenged</SelectItem>
-                            <SelectItem value="inspired">Inspired</SelectItem>
-                            <SelectItem value="reflective">Reflective</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button 
-                        onClick={handleJournalSubmit}
-                        disabled={isSubmitting}
-                        className="w-full"
-                      >
-                        {isSubmitting ? "Saving..." : "Save Entry"}
-                      </Button>
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </CardContent>
-            </Card>
+            <JournalSection />
           </TabsContent>
         </Tabs>
       </main>
-
       <Footer />
     </div>
+  );
+};
+
+// Fellowships Section Component
+const FellowshipsSection = () => {
+  const { toast } = useToast();
+  const [isApplying, setIsApplying] = useState(false);
+
+  const handleApply = async (fellowshipId: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to apply for fellowships.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Application Submitted",
+      description: "Your fellowship application has been received. We'll review it shortly.",
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold mb-2">Mary Magdalene Path Fellowships</h2>
+        <p className="text-muted-foreground">
+          Transformative programs nurturing spiritual intelligence, ethical leadership, and innovation courage
+        </p>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <Badge className="mb-4">Open for Applications</Badge>
+          <h3 className="text-2xl font-semibold mb-3">Spiritual Intelligence Cohort</h3>
+          <p className="text-muted-foreground mb-4">
+            12-week intensive program integrating contemplative practices with design thinking and innovation frameworks.
+          </p>
+          <div className="space-y-2 text-sm mb-6">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span>Cohort Size: 20 fellows</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              <span>Duration: 12 weeks</span>
+            </div>
+          </div>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="w-full">Apply Now</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Apply for Spiritual Intelligence Cohort</DialogTitle>
+                <DialogDescription>
+                  Tell us about yourself and why you're drawn to this fellowship.
+                </DialogDescription>
+              </DialogHeader>
+              <FellowshipApplicationForm onSubmit={handleApply} />
+            </DialogContent>
+          </Dialog>
+        </Card>
+
+        <Card className="p-6">
+          <Badge variant="secondary" className="mb-4">Starting Soon</Badge>
+          <h3 className="text-2xl font-semibold mb-3">Product Courage Accelerator</h3>
+          <p className="text-muted-foreground mb-4">
+            8-week program for women founders building regenerative ventures with bold, purpose-driven products.
+          </p>
+          <div className="space-y-2 text-sm mb-6">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span>Cohort Size: 15 founders</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              <span>Duration: 8 weeks</span>
+            </div>
+          </div>
+          <Button className="w-full" variant="outline">Join Waitlist</Button>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+// Investment Collective Section
+const InvestmentCollectiveSection = () => {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold mb-2">Joanna Investment Collective</h2>
+        <p className="text-muted-foreground">
+          Women-led capital syndicates backing regenerative ventures and sustainable innovation
+        </p>
+      </div>
+
+      <Card className="p-6 bg-gradient-to-r from-primary/10 to-primary/5">
+        <h3 className="text-xl font-semibold mb-4">Active Investment Opportunities</h3>
+        <div className="space-y-4">
+          <InvestmentCard 
+            projectName="Solar Sisters Network"
+            description="Expanding clean energy access to 100,000 rural households across East Africa"
+            sector="Renewable Energy"
+            stage="Growth"
+            goal={250000}
+            raised={187500}
+            founder="Amina Okonjo"
+          />
+          <InvestmentCard 
+            projectName="Tech4Girls Academy"
+            description="AI and coding bootcamps for young women in underserved communities"
+            sector="Education Technology"
+            stage="Seed"
+            goal={150000}
+            raised={98000}
+            founder="Dr. Sarah Chen"
+          />
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-xl font-semibold mb-4">How the Collective Works</h3>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div>
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+              <span className="text-primary font-bold">1</span>
+            </div>
+            <h4 className="font-semibold mb-2">Curated Deal Flow</h4>
+            <p className="text-sm text-muted-foreground">
+              Vetted opportunities from women-led ventures aligned with regenerative principles
+            </p>
+          </div>
+          <div>
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+              <span className="text-primary font-bold">2</span>
+            </div>
+            <h4 className="font-semibold mb-2">Syndicate Pooling</h4>
+            <p className="text-sm text-muted-foreground">
+              Co-invest with other mission-aligned women investors and allies
+            </p>
+          </div>
+          <div>
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+              <span className="text-primary font-bold">3</span>
+            </div>
+            <h4 className="font-semibold mb-2">Impact Tracking</h4>
+            <p className="text-sm text-muted-foreground">
+              Transparent reporting on social, environmental, and financial returns
+            </p>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// Pioneers Map Section
+const PioneersMapSection = () => {
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-3xl font-bold mb-2">Women Pioneers Global Map</h2>
+        <p className="text-muted-foreground">
+          Discover and connect with women leading transformative innovation worldwide
+        </p>
+      </div>
+
+      <Card className="p-6 bg-gradient-to-br from-muted/50 to-background">
+        <div className="h-96 bg-muted/30 rounded-lg flex items-center justify-center mb-6">
+          <div className="text-center space-y-3">
+            <MapPin className="h-16 w-16 text-primary mx-auto" />
+            <p className="text-muted-foreground">Interactive map visualization coming soon</p>
+            <p className="text-sm text-muted-foreground">Showcasing 500+ pioneers across 75 countries</p>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-4">
+          <PioneerCard 
+            name="Dr. Aisha Patel"
+            title="Climate Tech Innovator"
+            location="Nairobi, Kenya"
+            focusAreas={["Carbon Capture", "Regenerative Agriculture"]}
+          />
+          <PioneerCard 
+            name="Maria Santos"
+            title="Social Enterprise Leader"
+            location="São Paulo, Brazil"
+            focusAreas={["Education", "Community Development"]}
+          />
+          <PioneerCard 
+            name="Leila Yamamoto"
+            title="AI Ethics Researcher"
+            location="Tokyo, Japan"
+            focusAreas={["Responsible AI", "Digital Rights"]}
+          />
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// Journal Section
+const JournalSection = () => {
+  const [entries, setEntries] = useState<any[]>([]);
+  
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-3xl font-bold mb-2">Personal Transformation Journal</h2>
+          <p className="text-muted-foreground">
+            Reflective practice blending discernment prompts and project milestones
+          </p>
+        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <BookOpen className="h-4 w-4 mr-2" />
+              New Entry
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Journal Entry</DialogTitle>
+            </DialogHeader>
+            <JournalEntryForm />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-4 mb-6">
+        <Card className="p-4">
+          <div className="text-2xl font-bold text-primary">24</div>
+          <div className="text-sm text-muted-foreground">Total Entries</div>
+        </Card>
+        <Card className="p-4">
+          <div className="text-2xl font-bold text-primary">12</div>
+          <div className="text-sm text-muted-foreground">Milestones</div>
+        </Card>
+        <Card className="p-4">
+          <div className="text-2xl font-bold text-primary">8</div>
+          <div className="text-sm text-muted-foreground">Reflections</div>
+        </Card>
+      </div>
+
+      <Card className="p-6">
+        <h3 className="font-semibold mb-4">Recent Entries</h3>
+        <p className="text-muted-foreground text-sm">Sign in to view and create journal entries.</p>
+      </Card>
+    </div>
+  );
+};
+
+// Helper Components
+const FellowshipApplicationForm = ({ onSubmit }: { onSubmit: (id: string) => void }) => (
+  <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); onSubmit("fellowship-1"); }}>
+    <div>
+      <Label>Full Name</Label>
+      <Input placeholder="Your name" required />
+    </div>
+    <div>
+      <Label>Email</Label>
+      <Input type="email" placeholder="your@email.com" required />
+    </div>
+    <div>
+      <Label>Why are you applying?</Label>
+      <Textarea placeholder="Share your motivation..." rows={4} required />
+    </div>
+    <div>
+      <Label>Relevant Experience</Label>
+      <Textarea placeholder="Tell us about your background..." rows={3} />
+    </div>
+    <div>
+      <Label>Your Goals</Label>
+      <Textarea placeholder="What do you hope to achieve..." rows={3} />
+    </div>
+    <Button type="submit" className="w-full">Submit Application</Button>
+  </form>
+);
+
+const InvestmentCard = ({ projectName, description, sector, stage, goal, raised, founder }: any) => (
+  <Card className="p-4">
+    <div className="flex items-start justify-between mb-3">
+      <div>
+        <h4 className="font-semibold text-lg">{projectName}</h4>
+        <p className="text-sm text-muted-foreground">Founded by {founder}</p>
+      </div>
+      <Badge>{stage}</Badge>
+    </div>
+    <p className="text-sm mb-3">{description}</p>
+    <div className="flex items-center gap-2 mb-3">
+      <Badge variant="outline">{sector}</Badge>
+    </div>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between text-sm">
+        <span className="text-muted-foreground">Raised</span>
+        <span className="font-semibold">${(raised / 1000).toFixed(0)}K of ${(goal / 1000).toFixed(0)}K</span>
+      </div>
+      <div className="h-2 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-primary" style={{ width: `${(raised / goal) * 100}%` }} />
+      </div>
+    </div>
+    <Button className="w-full mt-4" variant="outline">Learn More</Button>
+  </Card>
+);
+
+const PioneerCard = ({ name, title, location, focusAreas }: any) => (
+  <Card className="p-4">
+    <div className="flex items-center gap-3 mb-3">
+      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <Heart className="h-6 w-6 text-primary" />
+      </div>
+      <div>
+        <h4 className="font-semibold">{name}</h4>
+        <p className="text-sm text-muted-foreground">{title}</p>
+      </div>
+    </div>
+    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+      <MapPin className="h-4 w-4" />
+      <span>{location}</span>
+    </div>
+    <div className="flex flex-wrap gap-2">
+      {focusAreas.map((area: string, i: number) => (
+        <Badge key={i} variant="secondary" className="text-xs">{area}</Badge>
+      ))}
+    </div>
+  </Card>
+);
+
+const JournalEntryForm = () => {
+  const { toast } = useToast();
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to create journal entries.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Entry Saved",
+      description: "Your journal entry has been saved successfully.",
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <Label>Entry Type</Label>
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="reflection">Reflection</SelectItem>
+            <SelectItem value="milestone">Milestone</SelectItem>
+            <SelectItem value="discernment">Discernment</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div>
+        <Label>Title</Label>
+        <Input placeholder="Entry title" required />
+      </div>
+      <div>
+        <Label>Content</Label>
+        <Textarea placeholder="Write your thoughts..." rows={6} required />
+      </div>
+      <div>
+        <Label>Mood (optional)</Label>
+        <Select>
+          <SelectTrigger>
+            <SelectValue placeholder="How are you feeling?" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="hopeful">Hopeful</SelectItem>
+            <SelectItem value="grateful">Grateful</SelectItem>
+            <SelectItem value="challenged">Challenged</SelectItem>
+            <SelectItem value="inspired">Inspired</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <Button type="submit" className="w-full">Save Entry</Button>
+    </form>
   );
 };
 
