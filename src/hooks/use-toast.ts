@@ -144,10 +144,24 @@ function toast({ ...props }: Toast) {
     });
   const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id });
 
+  // sanitize description to avoid rendering plain objects which show as "[object Object]"
+  const safeDescription = (() => {
+    const d: any = (props as any).description;
+    if (d === null || d === undefined) return d;
+    if (typeof d === "string") return d;
+    if (typeof d === "object") return d?.message ?? JSON.stringify(d);
+    try {
+      return String(d);
+    } catch {
+      return "An error occurred";
+    }
+  })();
+
   dispatch({
     type: "ADD_TOAST",
     toast: {
       ...props,
+      description: safeDescription,
       id,
       open: true,
       onOpenChange: (open) => {
