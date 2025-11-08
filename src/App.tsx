@@ -38,6 +38,7 @@ import Explore from "./pages/Explore";
 import Forums from "./pages/Forums";
 import Events from "./pages/Events";
 import Programs from "./pages/Programs";
+import AiBacklink from "./pages/AiBacklink";
 import Deployments from "./pages/Deployments";
 
 const queryClient = new QueryClient();
