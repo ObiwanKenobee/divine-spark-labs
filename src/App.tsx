@@ -14,6 +14,7 @@ import Organizations from "./pages/Organizations";
 import Enterprise from "./pages/Enterprise";
 import Onboarding from "./pages/Onboarding";
 import Workspaces from "./pages/Workspaces";
+import WorkspaceDetail from "./pages/WorkspaceDetail";
 import PaymentStatus from "./pages/PaymentStatus";
 import HeaderDemo from "./pages/HeaderDemo";
 import FooterDemo from "./pages/FooterDemo";
