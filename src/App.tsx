@@ -32,6 +32,7 @@ import Learning from "./pages/Learning";
 import Faith from "./pages/Faith";
 import Partnerships from "./pages/Partnerships";
 import Legal from "./pages/Legal";
+import Explore from "./pages/Explore";
 import Forums from "./pages/Forums";
 import Events from "./pages/Events";
 import Programs from "./pages/Programs";
