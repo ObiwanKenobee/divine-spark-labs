@@ -23,13 +23,36 @@ export default function NewsletterModal({ open, onClose }: { open: boolean; onCl
     }
     setLoading(true);
     try {
-      // naive local subscription: persist email locally. In production, replace with API call.
-      localStorage.setItem("jmf_newsletter_subscribed", email);
-      await new Promise((r) => setTimeout(r, 800));
-      toast({ title: "Subscribed", description: "Thank you — we've added you to the newsletter." });
-      onClose();
-    } catch (e) {
-      toast({ title: "Subscription failed", description: "Please try again later." });
+      // If Supabase is configured, try to insert into newsletter_subscribers table
+      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
+      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
+
+      if (supabaseUrl && supabaseKey) {
+        const { data, error } = await supabase
+          .from("newsletter_subscribers")
+          .insert({ email: email, subscribed_at: new Date().toISOString() })
+          .select();
+
+        if (error) {
+          // If insert fails due to duplicate or other, fall back to local storage but still inform
+          console.warn("Supabase newsletter insert error:", error.message);
+          localStorage.setItem("jmf_newsletter_subscribed", email);
+          toast({ title: "Subscribed (local)", description: "Saved locally because remote failed." });
+          onClose();
+        } else {
+          localStorage.setItem("jmf_newsletter_subscribed", email);
+          toast({ title: "Subscribed", description: "Thank you — we've added you to the newsletter." });
+          onClose();
+        }
+      } else {
+        // Supabase not configured — fallback to local storage
+        localStorage.setItem("jmf_newsletter_subscribed", email);
+        toast({ title: "Subscribed (local)", description: "Saved locally. Connect Supabase to persist subscribers." });
+        onClose();
+      }
+    } catch (e: any) {
+      console.error("Subscription error:", e);
+      toast({ title: "Subscription failed", description: e?.message || "Please try again later." });
     } finally {
       setLoading(false);
     }
