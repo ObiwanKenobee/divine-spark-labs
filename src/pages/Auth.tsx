@@ -289,7 +289,7 @@ const Auth = () => {
     try {
       const redirectUrl = `${window.location.origin}/auth`;
 
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -318,14 +318,59 @@ const Auth = () => {
         return;
       }
 
-      toast({
-        title: "Account created successfully!",
-        description: "You can now sign in to access the platform.",
-      });
+      // If enterprise onboarding requested, create a request record so the ops team can follow up
+      if (enterpriseOnboard) {
+        try {
+          await supabase.from('enterprise_onboarding_requests').insert({
+            user_email: email,
+            user_full_name: fullName,
+            org_name: orgName || null,
+            org_type: orgType || null,
+            billing_contact: billingContact || null,
+            legal_contact: legalContact || null,
+            sla_tier: slaTier || null,
+            sso_requested: ssoRequested || false,
+            status: 'pending',
+            created_at: new Date().toISOString()
+          });
+
+          // Audit log for enterprise request
+          try {
+            await supabase.from('audit_logs').insert({
+              tenant_id: null,
+              actor_id: null,
+              action: 'enterprise_onboarding.requested',
+              meta: JSON.stringify({ email, orgName, orgType, slaTier }),
+              created_at: new Date().toISOString()
+            });
+          } catch (e) {
+            console.warn('Failed to write audit log for enterprise request', e);
+          }
+
+          toast({
+            title: 'Enterprise onboarding requested',
+            description: 'Our team will reach out to you to complete onboarding and SSO setup.',
+          });
+        } catch (e: any) {
+          console.warn('Failed to create enterprise onboarding request', e);
+        }
+      } else {
+        toast({
+          title: "Account created successfully!",
+          description: "You can now sign in to access the platform.",
+        });
+      }
 
       setEmail("");
       setPassword("");
       setFullName("");
+      setOrgName("");
+      setOrgType("");
+      setBillingContact("");
+      setLegalContact("");
+      setSlaTier("");
+      setEnterpriseOnboard(false);
+      setSsoRequested(false);
     } catch (error: any) {
       toast({
         title: "Sign up failed",
