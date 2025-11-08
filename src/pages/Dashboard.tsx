@@ -11,6 +11,7 @@ import { FellowDashboard } from "./dashboards/FellowDashboard";
 import { DonorDashboard } from "./dashboards/DonorDashboard";
 import { AdminDashboard } from "./dashboards/AdminDashboard";
 import { InstitutionalDashboard } from "./dashboards/InstitutionalDashboard";
+import { CivilizationDashboard } from "./dashboards/CivilizationDashboard";
 import { ObserverDashboard } from "./dashboards/ObserverDashboard";
 import OpenAccessSanctumDashboard from "./dashboards/OpenAccessSanctumDashboard";
 
