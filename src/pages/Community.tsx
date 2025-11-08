@@ -15,12 +15,13 @@ const Community = () => (
         <div className="bg-card p-6 rounded-lg border">
           <h3 className="text-lg font-semibold">Forums</h3>
           <p className="text-sm text-muted-foreground">Participate in discussions, Q&A, and working groups.</p>
-          <div className="mt-4"><Button onClick={() => window.open('https://community.example.com', '_blank')}>Open Forum</Button></div>
+          <div className="mt-4"><Button onClick={() => window.location.href = '/forums'}>Open Forum</Button></div>
         </div>
 
         <div className="bg-card p-6 rounded-lg border">
           <h3 className="text-lg font-semibold">Events</h3>
           <p className="text-sm text-muted-foreground">Workshops, webinars, and fellowship opportunities.</p>
+          <div className="mt-4"><Button onClick={() => window.location.href = '/events'}>View Events</Button></div>
         </div>
       </div>
     </main>
