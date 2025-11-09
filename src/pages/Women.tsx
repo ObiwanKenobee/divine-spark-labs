@@ -311,7 +311,11 @@ const PioneersMapSection = () => {
 
       <Card className="p-6 bg-gradient-to-br from-muted/50 to-background">
         <div className="mb-6">
-          <WorldPioneersMap />
+          <ErrorBoundary>
+            <Suspense fallback={<div className="h-72 sm:h-[520px] w-full rounded-lg bg-muted/30 flex items-center justify-center">Loading map...</div>}>
+              <WorldPioneersMap />
+            </Suspense>
+          </ErrorBoundary>
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">
