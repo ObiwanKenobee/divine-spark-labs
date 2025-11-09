@@ -1,9 +1,10 @@
 import { useLocation } from "react-router-dom";
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import * as Router from 'react-router-dom';
 
 const NotFound = () => {
-  const location = useLocation();
+  // Use namespace import to avoid duplicate binding name collisions in some bundlers/HMR scenarios
+  const location = Router.useLocation();
 
   useEffect(() => {
     console.error("404 Error: User attempted to access non-existent route:", location.pathname);
