@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
 import PaymentSelector from "@/components/PaymentSelector";
 const InquiryModal = React.lazy(() => import('@/components/InquiryModal'));
+const OpenAccessModal = React.lazy(() => import('@/components/OpenAccessModal'));
 
 const Pricing = () => {
   const navigate = useNavigate();
