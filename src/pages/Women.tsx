@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, MapPin, Sparkles, TrendingUp, Users, Globe, BookOpen, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import WorldPioneersMap from "@/components/map/WorldPioneersMap";
 
 const Women = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -307,12 +308,8 @@ const PioneersMapSection = () => {
       </div>
 
       <Card className="p-6 bg-gradient-to-br from-muted/50 to-background">
-        <div className="h-96 bg-muted/30 rounded-lg flex items-center justify-center mb-6">
-          <div className="text-center space-y-3">
-            <MapPin className="h-16 w-16 text-primary mx-auto" />
-            <p className="text-muted-foreground">Interactive map visualization coming soon</p>
-            <p className="text-sm text-muted-foreground">Showcasing 500+ pioneers across 75 countries</p>
-          </div>
+        <div className="mb-6">
+          <WorldPioneersMap />
         </div>
 
         <div className="grid md:grid-cols-3 gap-4">
