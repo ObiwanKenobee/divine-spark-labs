@@ -80,7 +80,7 @@ export default function WorldPioneersMap() {
           zoom={2}
           minZoom={2}
           maxZoom={18}
-          className="h-[520px] w-full rounded-lg overflow-hidden"
+          className="h-72 sm:h-[520px] w-full rounded-lg overflow-hidden"
           whenCreated={(map) => (mapRef.current = map)}
         >
           <TileLayer
