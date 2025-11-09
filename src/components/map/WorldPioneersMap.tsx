@@ -58,15 +58,23 @@ export default function WorldPioneersMap() {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex items-center gap-2">
         <span className="text-sm text-muted-foreground">Filter by focus area:</span>
-        <ToggleGroup type="multiple" value={selectedAreas} onValueChange={(v) => setSelectedAreas(v)}>
-          {allFocusAreas.map((area) => (
-            <ToggleGroupItem key={area} value={area} aria-label={area}>
-              {area}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
+        <div className="flex-1">
+          <ToggleGroup
+            type="multiple"
+            value={selectedAreas}
+            onValueChange={(v) => setSelectedAreas(v)}
+            className="flex gap-2 overflow-x-auto pb-1"
+          >
+            {allFocusAreas.map((area) => (
+              <ToggleGroupItem key={area} value={area} aria-label={area} className="whitespace-nowrap px-3">
+                {area}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
+
         {selectedAreas.length > 0 && (
           <Button size="sm" variant="ghost" onClick={() => setSelectedAreas([])}>
             Clear filters
