@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
-import { useState } from "react";
 import PaymentSelector from "@/components/PaymentSelector";
+const InquiryModal = React.lazy(() => import('@/components/InquiryModal'));
+const OpenAccessModal = React.lazy(() => import('@/components/OpenAccessModal'));
 
 const Pricing = () => {
   const navigate = useNavigate();
@@ -87,7 +89,22 @@ const Pricing = () => {
     }
   ];
 
+  const [inquiryPlan, setInquiryPlan] = useState<any | null>(null);
+  const [openAccess, setOpenAccess] = useState(false);
+
   const handleGetStarted = (plan: { slug: string }) => {
+    // Open Access Sanctum: show modal with resources and newsletter
+    if (plan.slug === 'sanctum') {
+      setOpenAccess(true);
+      return;
+    }
+
+    // For institutional and civilization plans, open sales inquiry modal
+    if (plan.slug === 'institutional' || plan.slug === 'civilization') {
+      setInquiryPlan(plan);
+      return;
+    }
+
     const linkKey = `VITE_PAYMENT_LINK_${plan.slug.toUpperCase()}` as keyof ImportMetaEnv;
     const paymentLink = import.meta.env[linkKey as any] as string | undefined;
 
@@ -195,6 +212,18 @@ const Pricing = () => {
           ))}
           {activePlan && (
             <PaymentSelector plan={activePlan} onClose={() => setActivePlan(null)} />
+          )}
+          {inquiryPlan && (
+            <React.Suspense fallback={null}>
+              {/* Lazy load InquiryModal to keep bundle small */}
+              <InquiryModal plan={inquiryPlan} onClose={() => setInquiryPlan(null)} />
+            </React.Suspense>
+          )}
+
+          {openAccess && (
+            <React.Suspense fallback={null}>
+              <OpenAccessModal open={openAccess} onClose={() => setOpenAccess(false)} />
+            </React.Suspense>
           )}
         </div>
       </main>
