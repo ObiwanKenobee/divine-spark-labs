@@ -90,6 +90,7 @@ const Pricing = () => {
   ];
 
   const [inquiryPlan, setInquiryPlan] = useState<any | null>(null);
+  const [openAccess, setOpenAccess] = useState(false);
 
   const handleGetStarted = (plan: { slug: string }) => {
     // Open Access Sanctum: show modal with resources and newsletter
