@@ -56,16 +56,14 @@ const Pricing = () => {
       description: "For governments, universities, faith tech labs",
       impact: "Institutional moral infrastructure across 50+ nations",
       features: [
-        "All Innovator features",
-        "Custom deployment solutions",
-        "Multi-tenant organization licensing",
-        "Dedicated technical support",
-        "Governance framework integration",
-        "White-label moral design tools",
-        "Admin workspace management",
-        "Dedicated enhanced authentication",
-        "Enterprise SSO integration",
-        "Compliance & audit logging"
+        "Global coalition partnership",
+        "Autonomous sanctum development",
+        "Planetary-scale impact frameworks",
+        "24/7 dedicated civilization support",
+        "Co-creation of moral infrastructure",
+        "Owner-level workspace control",
+        "Custom infrastructure deployment",
+        "Strategic advisory board access"
       ]
     },
     {
