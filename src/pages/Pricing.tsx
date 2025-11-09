@@ -219,6 +219,12 @@ const Pricing = () => {
               <InquiryModal plan={inquiryPlan} onClose={() => setInquiryPlan(null)} />
             </React.Suspense>
           )}
+
+          {openAccess && (
+            <React.Suspense fallback={null}>
+              <OpenAccessModal open={openAccess} onClose={() => setOpenAccess(false)} />
+            </React.Suspense>
+          )}
         </div>
       </main>
 
