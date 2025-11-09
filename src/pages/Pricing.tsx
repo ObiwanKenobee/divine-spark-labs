@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Footer from "@/components/Footer";
-import { useState } from "react";
 import PaymentSelector from "@/components/PaymentSelector";
+const InquiryModal = React.lazy(() => import('@/components/InquiryModal'));
 
 const Pricing = () => {
   const navigate = useNavigate();
