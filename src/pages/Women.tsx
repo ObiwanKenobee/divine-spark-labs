@@ -13,7 +13,9 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, MapPin, Sparkles, TrendingUp, Users, Globe, BookOpen, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import WorldPioneersMap from "@/components/map/WorldPioneersMap";
+import React, { Suspense } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary';
+const WorldPioneersMap = React.lazy(() => import('@/components/map/WorldPioneersMap'));
 
 const Women = () => {
   const [activeTab, setActiveTab] = useState("overview");
