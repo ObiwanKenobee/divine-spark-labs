@@ -11,7 +11,10 @@ const samplePartnerships = [
   { id: 'p2', name: 'FaithTech Labs', sector: 'Technology', region: 'Global', lat: 37.7749, lng: -122.4194, status: 'pilot' },
 ];
 
+import { useToast } from '@/hooks/use-toast';
+
 export default function Partnerships() {
+  const { toast } = useToast();
   const [partnerships, setPartnerships] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -21,14 +24,29 @@ export default function Partnerships() {
       setLoading(true);
       try {
         if ((import.meta as any).env.VITE_SUPABASE_URL && (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+          // Primary attempt: partnerships table
           const { data, error } = await supabase.from('partnerships').select('*').limit(200);
-          if (error) throw error;
-          if (mounted) setPartnerships(data || []);
+          if (error) {
+            // If not found, attempt legacy/alternate table 'fellowships'
+            const msg = (error && error.message) || JSON.stringify(error);
+            console.warn('Supabase partnerships error:', msg);
+            if (msg && msg.includes("Could not find the table 'public.partnerships'")) {
+              toast({ title: 'Table missing', description: "'partnerships' table not found in Supabase, attempting 'fellowships' table instead", variant: 'warning' });
+              const alt = await supabase.from('fellowships').select('*').limit(200);
+              if (alt.error) throw alt.error;
+              if (mounted) setPartnerships(alt.data || samplePartnerships);
+            } else {
+              throw error;
+            }
+          } else {
+            if (mounted) setPartnerships(data || []);
+          }
         } else {
           if (mounted) setPartnerships(samplePartnerships);
         }
-      } catch (e) {
+      } catch (e: any) {
         console.warn('Failed to load partnerships', e);
+        toast({ title: 'Load failed', description: 'Could not load partnerships from Supabase — using sample data', variant: 'destructive' });
         if (mounted) setPartnerships(samplePartnerships);
       } finally {
         if (mounted) setLoading(false);
@@ -37,7 +55,7 @@ export default function Partnerships() {
 
     fetchPartnerships();
     return () => { mounted = false; };
-  }, []);
+  }, [toast]);
 
   return (
     <div className="min-h-screen bg-background">
