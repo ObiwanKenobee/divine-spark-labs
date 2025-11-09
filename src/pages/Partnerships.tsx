@@ -46,8 +46,25 @@ export default function Partnerships() {
         }
       } catch (e: any) {
         console.warn('Failed to load partnerships', e);
-        toast({ title: 'Load failed', description: 'Could not load partnerships from Supabase — using sample data', variant: 'destructive' });
-        if (mounted) setPartnerships(samplePartnerships);
+        const hasEnv = Boolean((import.meta as any).env.VITE_SUPABASE_URL && (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY);
+        // Send client-side log to serverless logs endpoint (best-effort)
+        try {
+          fetch('/.netlify/functions/logs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ level: 'error', message: 'Partnerships load failed', error: (e && (e.message || e)) || String(e), ts: new Date().toISOString() }),
+          }).catch(() => {});
+        } catch (_) {}
+
+        if (!hasEnv) {
+          // No Supabase configured — use sample data silently
+          if (mounted) setPartnerships(samplePartnerships);
+        } else {
+          // Supabase configured but fetch failed — show a less alarming toast with details
+          const msg = (e && (e.message || JSON.stringify(e))) || 'Unknown error';
+          toast({ title: 'Data load issue', description: `Could not load partnerships: ${msg}. Using sample data.`, variant: 'warning' });
+          if (mounted) setPartnerships(samplePartnerships);
+        }
       } finally {
         if (mounted) setLoading(false);
       }
