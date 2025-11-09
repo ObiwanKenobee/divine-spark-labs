@@ -40,6 +40,7 @@ import Events from "./pages/Events";
 import Programs from "./pages/Programs";
 import AiBacklink from "./pages/AiBacklink";
 import Deployments from "./pages/Deployments";
+import Matchmaking from "./pages/Matchmaking";
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 const queryClient = new QueryClient();
