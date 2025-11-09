@@ -50,45 +50,47 @@ const App = () => (
       <Sonner />
       <AutoReloader />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/enterprise" element={<Enterprise />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/onboarding" element={<Onboarding />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/workspaces" element={<Workspaces />} />
-          <Route path="/workspaces/:id" element={<WorkspaceDetail />} />
-          <Route path="/payment/status" element={<PaymentStatus />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/organizations" element={<Organizations />} />
-          <Route path="/platform" element={<Platform />} />
-          <Route path="/impact" element={<Impact />} />
-          <Route path="/ethics" element={<Ethics />} />
-          <Route path="/community" element={<Community />} />
-          <Route path="/forums" element={<Forums />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/programs" element={<Programs />} />
-          <Route path="/solutions" element={<Solutions />} />
-          <Route path="/innovator" element={<Innovator />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/mission" element={<Mission />} />
-          <Route path="/women" element={<Women />} />
-          <Route path="/labs" element={<Labs />} />
-          <Route path="/mentorship" element={<Mentorship />} />
-          <Route path="/innovation" element={<Innovation />} />
-          <Route path="/learning" element={<Learning />} />
-          <Route path="/faith" element={<Faith />} />
-          <Route path="/partnerships" element={<Partnerships />} />
-          <Route path="/legal" element={<Legal />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/header-demo" element={<HeaderDemo />} />
-          <Route path="/footer-demo" element={<FooterDemo />} />
-          <Route path="/deployments" element={<Deployments />} />
-          <Route path="/ai-backlink" element={<AiBacklink />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/enterprise" element={<Enterprise />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/onboarding" element={<Onboarding />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/workspaces" element={<Workspaces />} />
+            <Route path="/workspaces/:id" element={<WorkspaceDetail />} />
+            <Route path="/payment/status" element={<PaymentStatus />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/organizations" element={<Organizations />} />
+            <Route path="/platform" element={<Platform />} />
+            <Route path="/impact" element={<Impact />} />
+            <Route path="/ethics" element={<Ethics />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/forums" element={<Forums />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/programs" element={<Programs />} />
+            <Route path="/solutions" element={<Solutions />} />
+            <Route path="/innovator" element={<Innovator />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/mission" element={<Mission />} />
+            <Route path="/women" element={<Women />} />
+            <Route path="/labs" element={<Labs />} />
+            <Route path="/mentorship" element={<Mentorship />} />
+            <Route path="/innovation" element={<Innovation />} />
+            <Route path="/learning" element={<Learning />} />
+            <Route path="/faith" element={<Faith />} />
+            <Route path="/partnerships" element={<Partnerships />} />
+            <Route path="/legal" element={<Legal />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/header-demo" element={<HeaderDemo />} />
+            <Route path="/footer-demo" element={<FooterDemo />} />
+            <Route path="/deployments" element={<Deployments />} />
+            <Route path="/ai-backlink" element={<AiBacklink />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
