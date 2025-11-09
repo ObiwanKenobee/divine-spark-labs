@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 export default function InquiryModal({ plan, onClose }: { plan: any; onClose: () => void }) {
   const [name, setName] = useState('');
@@ -9,14 +11,46 @@ export default function InquiryModal({ plan, onClose }: { plan: any; onClose: ()
   const [org, setOrg] = useState('');
   const [message, setMessage] = useState('');
   const [sent, setSent] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For now, store inquiry in localStorage as a lightweight fallback until MCP is connected
-    const existing = JSON.parse(localStorage.getItem('jmf_inquiries' ) || '[]');
-    existing.push({ plan: plan.slug, name, email, org, message, created_at: new Date().toISOString() });
-    localStorage.setItem('jmf_inquiries', JSON.stringify(existing));
-    setSent(true);
+
+    // Try to persist via Supabase if configured
+    try {
+      if ((import.meta as any).env.VITE_SUPABASE_URL && (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY) {
+        const payload = {
+          plan: plan.slug,
+          name,
+          email,
+          organization: org,
+          message,
+          metadata: {},
+        } as any;
+
+        const { data, error } = await supabase.from('inquiries').insert([payload]).select().single();
+        if (error) throw error;
+
+        setSent(true);
+        toast({ title: 'Inquiry sent', description: 'We received your inquiry and will contact you shortly.' });
+        return;
+      }
+    } catch (err: any) {
+      console.warn('Supabase insert failed, falling back to localStorage', err?.message || err);
+      toast({ title: 'Saved locally', description: 'Saved inquiry locally. Connect Supabase to persist it centrally.', variant: 'warning' });
+    }
+
+    // Fallback: store inquiry in localStorage
+    try {
+      const existing = JSON.parse(localStorage.getItem('jmf_inquiries') || '[]');
+      existing.push({ plan: plan.slug, name, email, org, message, created_at: new Date().toISOString() });
+      localStorage.setItem('jmf_inquiries', JSON.stringify(existing));
+      setSent(true);
+      toast({ title: 'Saved locally', description: 'Inquiry saved locally. Will persist centrally when Supabase is connected.' });
+    } catch (e) {
+      console.error('Failed to save inquiry locally', e);
+      toast({ title: 'Error', description: 'Could not save inquiry. Please try again later.', variant: 'destructive' });
+    }
   };
 
   return (
