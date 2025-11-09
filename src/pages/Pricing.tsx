@@ -92,6 +92,12 @@ const Pricing = () => {
   const [inquiryPlan, setInquiryPlan] = useState<any | null>(null);
 
   const handleGetStarted = (plan: { slug: string }) => {
+    // Open Access Sanctum: show modal with resources and newsletter
+    if (plan.slug === 'sanctum') {
+      setOpenAccess(true);
+      return;
+    }
+
     // For institutional and civilization plans, open sales inquiry modal
     if (plan.slug === 'institutional' || plan.slug === 'civilization') {
       setInquiryPlan(plan);
