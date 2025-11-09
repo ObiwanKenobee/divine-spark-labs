@@ -204,6 +204,12 @@ const Pricing = () => {
           {activePlan && (
             <PaymentSelector plan={activePlan} onClose={() => setActivePlan(null)} />
           )}
+          {inquiryPlan && (
+            <React.Suspense fallback={null}>
+              {/* Lazy load InquiryModal to keep bundle small */}
+              <InquiryModal plan={inquiryPlan} onClose={() => setInquiryPlan(null)} />
+            </React.Suspense>
+          )}
         </div>
       </main>
 
