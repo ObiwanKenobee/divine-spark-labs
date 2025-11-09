@@ -87,7 +87,15 @@ const Pricing = () => {
     }
   ];
 
+  const [inquiryPlan, setInquiryPlan] = useState<any | null>(null);
+
   const handleGetStarted = (plan: { slug: string }) => {
+    // For institutional and civilization plans, open sales inquiry modal
+    if (plan.slug === 'institutional' || plan.slug === 'civilization') {
+      setInquiryPlan(plan);
+      return;
+    }
+
     const linkKey = `VITE_PAYMENT_LINK_${plan.slug.toUpperCase()}` as keyof ImportMetaEnv;
     const paymentLink = import.meta.env[linkKey as any] as string | undefined;
 
