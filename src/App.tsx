@@ -41,6 +41,9 @@ import Programs from "./pages/Programs";
 import AiBacklink from "./pages/AiBacklink";
 import Deployments from "./pages/Deployments";
 import Matchmaking from "./pages/Matchmaking";
+import Pillars from "./pages/Pillars";
+import Resources from "./pages/Resources";
+import Frameworks from "./pages/Frameworks";
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 const queryClient = new QueryClient();
