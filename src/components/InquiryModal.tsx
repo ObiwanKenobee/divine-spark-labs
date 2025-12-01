@@ -16,19 +16,24 @@ export default function InquiryModal({ plan, onClose }: { plan: any; onClose: ()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Store inquiry in localStorage (inquiries table not yet configured)
-    console.log('Inquiry submitted:', { plan: plan.slug, name, email, org, message });
-
-    // Fallback: store inquiry in localStorage
     try {
-      const existing = JSON.parse(localStorage.getItem('jmf_inquiries') || '[]');
-      existing.push({ plan: plan.slug, name, email, org, message, created_at: new Date().toISOString() });
-      localStorage.setItem('jmf_inquiries', JSON.stringify(existing));
+      const payload = {
+        plan: plan.slug,
+        name,
+        email,
+        organization: org,
+        message,
+        metadata: {},
+      };
+
+      const { error } = await supabase.from('inquiries').insert([payload]);
+      if (error) throw error;
+
       setSent(true);
-      toast({ title: 'Saved locally', description: 'Inquiry saved locally. Will persist centrally when Supabase is connected.' });
-    } catch (e) {
-      console.error('Failed to save inquiry locally', e);
-      toast({ title: 'Error', description: 'Could not save inquiry. Please try again later.', variant: 'destructive' });
+      toast({ title: 'Inquiry sent', description: 'We received your inquiry and will contact you shortly.' });
+    } catch (err: any) {
+      console.error('Failed to submit inquiry:', err);
+      toast({ title: 'Error', description: 'Could not submit inquiry. Please try again.', variant: 'destructive' });
     }
   };
 

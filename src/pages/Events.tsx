@@ -21,15 +21,17 @@ const Events = () => {
   const load = async () => {
     setLoading(true);
     try {
-      // Events table not yet configured, use sample data
-      const sample = [
-        { id: 'e1', title: 'Women in Tech Summit', date: '2025-03-15', description: 'Annual gathering', location: 'Virtual' },
-        { id: 'e2', title: 'Innovation Workshop', date: '2025-04-20', description: 'Hands-on session', location: 'Nairobi' },
-      ];
-      setEvents(sample);
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .order("date", { ascending: true })
+        .limit(200);
+      
+      if (error) throw error;
+      setEvents(data || []);
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Failed to load events", description: e?.message || "" });
+      toast({ title: "Failed to load events", description: e?.message || "Please try again" });
     } finally {
       setLoading(false);
     }
@@ -42,12 +44,27 @@ const Events = () => {
       toast({ title: "Missing fields", description: "Please provide title and date." });
       return;
     }
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Authentication required", description: "Please sign in to create events.", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
     try {
-      // Events table not yet configured, use sample data
-      const item = { id: Math.random().toString(36).slice(2), title: title.trim(), date, description: description.trim(), location: location.trim() };
-      setEvents((e) => [item, ...e]);
+      const item = { 
+        title: title.trim(), 
+        date, 
+        description: description.trim(), 
+        location: location.trim(),
+        user_id: user.id
+      };
       
+      const { data, error } = await supabase.from("events").insert(item).select();
+      if (error) throw error;
+      
+      setEvents((e) => [...(data || []), ...e]);
       setTitle("");
       setDate("");
       setDescription("");

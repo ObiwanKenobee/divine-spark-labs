@@ -149,6 +149,39 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          created_at: string
+          date: string
+          description: string | null
+          id: string
+          location: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       fellowship_applications: {
         Row: {
           applicant_name: string
@@ -250,6 +283,69 @@ export type Database = {
           status?: string
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      forums: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      inquiries: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          metadata: Json | null
+          name: string
+          organization: string | null
+          plan: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          name: string
+          organization?: string | null
+          plan: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          name?: string
+          organization?: string | null
+          plan?: string
+          status?: string | null
         }
         Relationships: []
       }
@@ -466,6 +562,54 @@ export type Database = {
         }
         Relationships: []
       }
+      partnerships: {
+        Row: {
+          contact_email: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          region: string
+          sector: string
+          status: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          region: string
+          sector: string
+          status?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          region?: string
+          sector?: string
+          status?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -506,6 +650,77 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      program_members: {
+        Row: {
+          id: string
+          joined_at: string
+          program_id: string
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          program_id: string
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          program_id?: string
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "program_members_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      programs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          seats: number | null
+          start_date: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          seats?: number | null
+          start_date?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          seats?: number | null
+          start_date?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       research_conversations: {
         Row: {

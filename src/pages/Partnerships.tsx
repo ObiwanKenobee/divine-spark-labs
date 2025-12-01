@@ -23,8 +23,13 @@ export default function Partnerships() {
     const fetchPartnerships = async () => {
       setLoading(true);
       try {
-        // Partnerships table not yet configured, use sample data
-        if (mounted) setPartnerships(samplePartnerships);
+        const { data, error } = await supabase
+          .from('partnerships')
+          .select('*')
+          .limit(200);
+        
+        if (error) throw error;
+        if (mounted) setPartnerships(data || samplePartnerships);
       } catch (e: any) {
         console.warn('Failed to load partnerships', e);
         if (mounted) setPartnerships(samplePartnerships);
