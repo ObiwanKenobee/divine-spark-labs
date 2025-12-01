@@ -34,7 +34,11 @@ export default function WorkspaceDetail() {
 
   const fetchLogs = async () => {
     try {
-      const { data } = await supabase.from('audit_logs').select('*').eq('workspace_id', id).order('created_at', { ascending: false }).limit(50);
+      const { data } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .limit(50)
+        .order('created_at', { ascending: false });
       setAuditLogs(data || []);
     } catch (e) {
       console.debug('Failed to fetch audit logs', e);

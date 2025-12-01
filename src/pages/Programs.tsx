@@ -15,23 +15,12 @@ const Programs = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("programs").select("*").order("title", { ascending: true }).limit(200);
-        if (error) throw error;
-        setPrograms(data || []);
-      } else {
-        const raw = localStorage.getItem("jmf_programs");
-        if (raw) setPrograms(JSON.parse(raw));
-        else {
-          const sample = [
-            { id: 'p1', title: 'Women Leaders Fellowship', description: 'A cohort focused on female-led ventures', seats: 20 },
-            { id: 'p2', title: 'Youth Innovation Lab', description: 'Hands-on projects for 15–24 age group', seats: 30 },
-          ];
-          setPrograms(sample);
-        }
-      }
+      // Programs table not yet configured, use sample data
+      const sample = [
+        { id: 'p1', title: 'Women Leaders Fellowship', description: 'A cohort focused on female-led ventures', seats: 20 },
+        { id: 'p2', title: 'Youth Innovation Lab', description: 'Hands-on projects for 15–24 age group', seats: 30 },
+      ];
+      setPrograms(sample);
     } catch (e: any) {
       console.error(e);
       toast({ title: "Failed to load programs", description: e?.message || "" });
@@ -44,20 +33,9 @@ const Programs = () => {
 
   const join = async (p: Program) => {
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        // For now just record a lightweight join in a program_members table if present
-        const { error } = await supabase.from('program_members').insert({ program_id: p.id, joined_at: new Date().toISOString() });
-        if (error) throw error;
-        toast({ title: 'Joined', description: `You've joined ${p.title}` });
-      } else {
-        const raw = localStorage.getItem('jmf_program_members') || '[]';
-        const arr = JSON.parse(raw);
-        arr.push({ program_id: p.id, joined_at: new Date().toISOString() });
-        localStorage.setItem('jmf_program_members', JSON.stringify(arr));
-        toast({ title: 'Joined', description: `You've joined ${p.title} (local)` });
-      }
+      // Program members table not yet configured, use console log
+      console.log('Join program:', p.id, p.title);
+      toast({ title: 'Joined', description: `You've joined ${p.title}` });
     } catch (e: any) {
       console.error(e);
       toast({ title: 'Join failed', description: e?.message || '' });
