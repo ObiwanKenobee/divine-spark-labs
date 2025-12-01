@@ -21,19 +21,17 @@ const Events = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("events").select("*").order("date", { ascending: true }).limit(200);
-        if (error) throw error;
-        setEvents(data || []);
-      } else {
-        const raw = localStorage.getItem("jmf_events");
-        setEvents(raw ? JSON.parse(raw) : []);
-      }
+      const { data, error } = await supabase
+        .from("events")
+        .select("*")
+        .order("date", { ascending: true })
+        .limit(200);
+      
+      if (error) throw error;
+      setEvents(data || []);
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Failed to load events", description: e?.message || "" });
+      toast({ title: "Failed to load events", description: e?.message || "Please try again" });
     } finally {
       setLoading(false);
     }
@@ -46,22 +44,27 @@ const Events = () => {
       toast({ title: "Missing fields", description: "Please provide title and date." });
       return;
     }
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Authentication required", description: "Please sign in to create events.", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
     try {
-      const item = { title: title.trim(), date: date, description: description.trim(), location: location.trim() };
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("events").insert(item).select();
-        if (error) throw error;
-        setEvents((e) => [...(data || []), ...e]);
-      } else {
-        const raw = localStorage.getItem("jmf_events");
-        const arr = raw ? JSON.parse(raw) : [];
-        arr.push({ ...item, id: Math.random().toString(36).slice(2) });
-        localStorage.setItem("jmf_events", JSON.stringify(arr));
-        setEvents(arr);
-      }
+      const item = { 
+        title: title.trim(), 
+        date, 
+        description: description.trim(), 
+        location: location.trim(),
+        user_id: user.id
+      };
+      
+      const { data, error } = await supabase.from("events").insert(item).select();
+      if (error) throw error;
+      
+      setEvents((e) => [...(data || []), ...e]);
       setTitle("");
       setDate("");
       setDescription("");

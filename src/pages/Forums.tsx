@@ -19,20 +19,17 @@ const Forums = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("forums").select("*").order("created_at", { ascending: false }).limit(200);
-        if (error) throw error;
-        setTopics(data || []);
-      } else {
-        // fallback to localStorage sample
-        const raw = localStorage.getItem("jmf_forums");
-        setTopics(raw ? JSON.parse(raw) : []);
-      }
+      const { data, error } = await supabase
+        .from("forums")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(200);
+      
+      if (error) throw error;
+      setTopics(data || []);
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Failed to load topics", description: e?.message || "" });
+      toast({ title: "Failed to load topics", description: e?.message || "Please try again" });
     } finally {
       setLoading(false);
     }
@@ -45,22 +42,25 @@ const Forums = () => {
       toast({ title: "Missing fields", description: "Please provide title and content." });
       return;
     }
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Authentication required", description: "Please sign in to post topics.", variant: "destructive" });
+      return;
+    }
+
     setLoading(true);
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      const newTopic = { title: title.trim(), content: content.trim(), created_at: new Date().toISOString() };
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("forums").insert(newTopic).select();
-        if (error) throw error;
-        setTopics((t) => [...(data || []), ...t]);
-      } else {
-        const raw = localStorage.getItem("jmf_forums");
-        const arr = raw ? JSON.parse(raw) : [];
-        arr.unshift({ ...newTopic, id: Math.random().toString(36).slice(2) });
-        localStorage.setItem("jmf_forums", JSON.stringify(arr));
-        setTopics(arr);
-      }
+      const newTopic = { 
+        title: title.trim(), 
+        content: content.trim(),
+        user_id: user.id
+      };
+      
+      const { data, error } = await supabase.from("forums").insert(newTopic).select();
+      if (error) throw error;
+      
+      setTopics((t) => [...(data || []), ...t]);
       setTitle("");
       setContent("");
       toast({ title: "Posted", description: "Your topic has been created." });

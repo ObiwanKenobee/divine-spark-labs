@@ -15,26 +15,17 @@ const Programs = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("programs").select("*").order("title", { ascending: true }).limit(200);
-        if (error) throw error;
-        setPrograms(data || []);
-      } else {
-        const raw = localStorage.getItem("jmf_programs");
-        if (raw) setPrograms(JSON.parse(raw));
-        else {
-          const sample = [
-            { id: 'p1', title: 'Women Leaders Fellowship', description: 'A cohort focused on female-led ventures', seats: 20 },
-            { id: 'p2', title: 'Youth Innovation Lab', description: 'Hands-on projects for 15–24 age group', seats: 30 },
-          ];
-          setPrograms(sample);
-        }
-      }
+      const { data, error } = await supabase
+        .from("programs")
+        .select("*")
+        .order("title", { ascending: true })
+        .limit(200);
+      
+      if (error) throw error;
+      setPrograms(data || []);
     } catch (e: any) {
       console.error(e);
-      toast({ title: "Failed to load programs", description: e?.message || "" });
+      toast({ title: "Failed to load programs", description: e?.message || "Please try again" });
     } finally {
       setLoading(false);
     }
@@ -43,21 +34,19 @@ const Programs = () => {
   useEffect(() => { load(); }, []);
 
   const join = async (p: Program) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Authentication required", description: "Please sign in to join programs.", variant: "destructive" });
+      return;
+    }
+
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        // For now just record a lightweight join in a program_members table if present
-        const { error } = await supabase.from('program_members').insert({ program_id: p.id, joined_at: new Date().toISOString() });
-        if (error) throw error;
-        toast({ title: 'Joined', description: `You've joined ${p.title}` });
-      } else {
-        const raw = localStorage.getItem('jmf_program_members') || '[]';
-        const arr = JSON.parse(raw);
-        arr.push({ program_id: p.id, joined_at: new Date().toISOString() });
-        localStorage.setItem('jmf_program_members', JSON.stringify(arr));
-        toast({ title: 'Joined', description: `You've joined ${p.title} (local)` });
-      }
+      const { error } = await supabase
+        .from('program_members')
+        .insert({ program_id: p.id, user_id: user.id });
+      
+      if (error) throw error;
+      toast({ title: 'Joined', description: `You've joined ${p.title}` });
     } catch (e: any) {
       console.error(e);
       toast({ title: 'Join failed', description: e?.message || '' });
