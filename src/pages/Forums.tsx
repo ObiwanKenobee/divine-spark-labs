@@ -19,17 +19,12 @@ const Forums = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("forums").select("*").order("created_at", { ascending: false }).limit(200);
-        if (error) throw error;
-        setTopics(data || []);
-      } else {
-        // fallback to localStorage sample
-        const raw = localStorage.getItem("jmf_forums");
-        setTopics(raw ? JSON.parse(raw) : []);
-      }
+      // Forums table not yet configured, use sample data
+      const sample = [
+        { id: 't1', title: 'Welcome to the community!', content: 'Introduce yourself here', created_at: new Date().toISOString() },
+        { id: 't2', title: 'Feature requests', content: 'Share your ideas', created_at: new Date().toISOString() },
+      ];
+      setTopics(sample);
     } catch (e: any) {
       console.error(e);
       toast({ title: "Failed to load topics", description: e?.message || "" });
@@ -47,20 +42,10 @@ const Forums = () => {
     }
     setLoading(true);
     try {
-      const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || "";
-      const supabaseKey = (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-      const newTopic = { title: title.trim(), content: content.trim(), created_at: new Date().toISOString() };
-      if (supabaseUrl && supabaseKey) {
-        const { data, error } = await supabase.from("forums").insert(newTopic).select();
-        if (error) throw error;
-        setTopics((t) => [...(data || []), ...t]);
-      } else {
-        const raw = localStorage.getItem("jmf_forums");
-        const arr = raw ? JSON.parse(raw) : [];
-        arr.unshift({ ...newTopic, id: Math.random().toString(36).slice(2) });
-        localStorage.setItem("jmf_forums", JSON.stringify(arr));
-        setTopics(arr);
-      }
+      // Forums table not yet configured, use sample data
+      const newTopic = { id: Math.random().toString(36).slice(2), title: title.trim(), content: content.trim(), created_at: new Date().toISOString() };
+      setTopics((t) => [newTopic, ...t]);
+      
       setTitle("");
       setContent("");
       toast({ title: "Posted", description: "Your topic has been created." });

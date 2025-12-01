@@ -13,7 +13,7 @@ export default function Matchmaking() {
 
   const runMatch = async () => {
     if (!proposalId) {
-      toast({ title: 'Missing proposal id', description: 'Enter a proposal id to match', variant: 'warning' });
+      toast({ title: 'Missing proposal id', description: 'Enter a proposal id to match', variant: 'destructive' });
       return;
     }
     setLoading(true);

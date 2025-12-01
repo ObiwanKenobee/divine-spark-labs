@@ -23,48 +23,11 @@ export default function Partnerships() {
     const fetchPartnerships = async () => {
       setLoading(true);
       try {
-        if ((import.meta as any).env.VITE_SUPABASE_URL && (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY) {
-          // Primary attempt: partnerships table
-          const { data, error } = await supabase.from('partnerships').select('*').limit(200);
-          if (error) {
-            // If not found, attempt legacy/alternate table 'fellowships'
-            const msg = (error && error.message) || JSON.stringify(error);
-            console.warn('Supabase partnerships error:', msg);
-            if (msg && msg.includes("Could not find the table 'public.partnerships'")) {
-              toast({ title: 'Table missing', description: "'partnerships' table not found in Supabase, attempting 'fellowships' table instead", variant: 'warning' });
-              const alt = await supabase.from('fellowships').select('*').limit(200);
-              if (alt.error) throw alt.error;
-              if (mounted) setPartnerships(alt.data || samplePartnerships);
-            } else {
-              throw error;
-            }
-          } else {
-            if (mounted) setPartnerships(data || []);
-          }
-        } else {
-          if (mounted) setPartnerships(samplePartnerships);
-        }
+        // Partnerships table not yet configured, use sample data
+        if (mounted) setPartnerships(samplePartnerships);
       } catch (e: any) {
         console.warn('Failed to load partnerships', e);
-        const hasEnv = Boolean((import.meta as any).env.VITE_SUPABASE_URL && (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY);
-        // Send client-side log to serverless logs endpoint (best-effort)
-        try {
-          fetch('/.netlify/functions/logs', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ level: 'error', message: 'Partnerships load failed', error: (e && (e.message || e)) || String(e), ts: new Date().toISOString() }),
-          }).catch(() => {});
-        } catch (_) {}
-
-        if (!hasEnv) {
-          // No Supabase configured — use sample data silently
-          if (mounted) setPartnerships(samplePartnerships);
-        } else {
-          // Supabase configured but fetch failed — show a less alarming toast with details
-          const msg = (e && (e.message || JSON.stringify(e))) || 'Unknown error';
-          toast({ title: 'Data load issue', description: `Could not load partnerships: ${msg}. Using sample data.`, variant: 'warning' });
-          if (mounted) setPartnerships(samplePartnerships);
-        }
+        if (mounted) setPartnerships(samplePartnerships);
       } finally {
         if (mounted) setLoading(false);
       }

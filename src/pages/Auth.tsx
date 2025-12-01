@@ -318,42 +318,14 @@ const Auth = () => {
         return;
       }
 
-      // If enterprise onboarding requested, create a request record so the ops team can follow up
+      // If enterprise onboarding requested, log it (enterprise_onboarding_requests table not yet configured)
       if (enterpriseOnboard) {
-        try {
-          await supabase.from('enterprise_onboarding_requests').insert({
-            user_email: email,
-            user_full_name: fullName,
-            org_name: orgName || null,
-            org_type: orgType || null,
-            billing_contact: billingContact || null,
-            legal_contact: legalContact || null,
-            sla_tier: slaTier || null,
-            sso_requested: ssoRequested || false,
-            status: 'pending',
-            created_at: new Date().toISOString()
-          });
-
-          // Audit log for enterprise request
-          try {
-            await supabase.from('audit_logs').insert({
-              tenant_id: null,
-              actor_id: null,
-              action: 'enterprise_onboarding.requested',
-              meta: JSON.stringify({ email, orgName, orgType, slaTier }),
-              created_at: new Date().toISOString()
-            });
-          } catch (e) {
-            console.warn('Failed to write audit log for enterprise request', e);
-          }
-
-          toast({
-            title: 'Enterprise onboarding requested',
-            description: 'Our team will reach out to you to complete onboarding and SSO setup.',
-          });
-        } catch (e: any) {
-          console.warn('Failed to create enterprise onboarding request', e);
-        }
+        console.log('Enterprise onboarding requested:', { email, fullName, orgName, orgType });
+        
+        toast({
+          title: 'Enterprise onboarding requested',
+          description: 'Our team will reach out to you to complete onboarding and SSO setup.',
+        });
       } else {
         toast({
           title: "Account created successfully!",

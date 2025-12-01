@@ -16,29 +16,8 @@ export default function InquiryModal({ plan, onClose }: { plan: any; onClose: ()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Try to persist via Supabase if configured
-    try {
-      if ((import.meta as any).env.VITE_SUPABASE_URL && (import.meta as any).env.VITE_SUPABASE_PUBLISHABLE_KEY) {
-        const payload = {
-          plan: plan.slug,
-          name,
-          email,
-          organization: org,
-          message,
-          metadata: {},
-        } as any;
-
-        const { data, error } = await supabase.from('inquiries').insert([payload]).select().single();
-        if (error) throw error;
-
-        setSent(true);
-        toast({ title: 'Inquiry sent', description: 'We received your inquiry and will contact you shortly.' });
-        return;
-      }
-    } catch (err: any) {
-      console.warn('Supabase insert failed, falling back to localStorage', err?.message || err);
-      toast({ title: 'Saved locally', description: 'Saved inquiry locally. Connect Supabase to persist it centrally.', variant: 'warning' });
-    }
+    // Store inquiry in localStorage (inquiries table not yet configured)
+    console.log('Inquiry submitted:', { plan: plan.slug, name, email, org, message });
 
     // Fallback: store inquiry in localStorage
     try {
