@@ -272,7 +272,7 @@ export default function Onboarding() {
       try {
         await supabase.from('audit_logs').insert({
           tenant_id: profile?.tenant_id,
-          workspace_id: data?.workspaceId || null,
+          workspace_id: workspace?.id || null,
           actor_id: user.id,
           action: 'workspace.provisioned.via_onboarding',
           meta: JSON.stringify({ name: workspaceName }),
