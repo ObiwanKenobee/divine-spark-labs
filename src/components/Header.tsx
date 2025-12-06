@@ -203,6 +203,7 @@ export default function Header() {
             <button onClick={() => { navigate('/impact'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Impact</button>
             <button onClick={() => { navigate('/ethics'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Ethics</button>
             <button onClick={() => { navigate('/community'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Community</button>
+            <button onClick={() => { navigate('/empowerment'); setMobileOpen(false); }} className="py-2 px-3 rounded hover:bg-slate-50 text-left">Empowerment</button>
             <div className="border-t pt-2 mt-2">
               <div className="text-xs uppercase text-slate-500 px-3 mb-1">Explore</div>
               <button onClick={() => { navigate('/about'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">About</button>
