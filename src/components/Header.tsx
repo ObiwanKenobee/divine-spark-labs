@@ -76,6 +76,7 @@ export default function Header() {
             <button onClick={() => navigate('/impact')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Impact</button>
             <button onClick={() => navigate('/ethics')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Ethics</button>
             <button onClick={() => navigate('/community')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Community</button>
+            <button onClick={() => navigate('/empowerment')} className="text-sm font-medium text-slate-700 hover:text-slate-900">Empowerment</button>
 
             <div className="relative">
               <div className="inline-block text-left">
