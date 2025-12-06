@@ -44,6 +44,18 @@ import Matchmaking from "./pages/Matchmaking";
 import Pillars from "./pages/Pillars";
 import Resources from "./pages/Resources";
 import Frameworks from "./pages/Frameworks";
+import Proposals from "./pages/Proposals";
+import Empowerment from "./pages/Empowerment";
+import WorkInnovation from "./pages/empowerment/WorkInnovation";
+import AgencyMastery from "./pages/empowerment/AgencyMastery";
+import IdentityWorth from "./pages/empowerment/IdentityWorth";
+import NetworkGood from "./pages/empowerment/NetworkGood";
+import SystemTransformation from "./pages/empowerment/SystemTransformation";
+import CompassionCare from "./pages/empowerment/CompassionCare";
+import ResilienceAntiFragility from "./pages/empowerment/ResilienceAntiFragility";
+import QuietIntelligence from "./pages/empowerment/QuietIntelligence";
+import IntergenerationalEngine from "./pages/empowerment/IntergenerationalEngine";
+import CoherenceArchitecture from "./pages/empowerment/CoherenceArchitecture";
 import ErrorBoundary from '@/components/ErrorBoundary';
 
 const queryClient = new QueryClient();
@@ -96,6 +108,18 @@ const App = () => (
             <Route path="/footer-demo" element={<FooterDemo />} />
             <Route path="/deployments" element={<Deployments />} />
             <Route path="/ai-backlink" element={<AiBacklink />} />
+            <Route path="/proposals" element={<Proposals />} />
+            <Route path="/empowerment" element={<Empowerment />} />
+            <Route path="/empowerment/work-innovation" element={<WorkInnovation />} />
+            <Route path="/empowerment/agency-mastery" element={<AgencyMastery />} />
+            <Route path="/empowerment/identity-worth" element={<IdentityWorth />} />
+            <Route path="/empowerment/network-good" element={<NetworkGood />} />
+            <Route path="/empowerment/system-transformation" element={<SystemTransformation />} />
+            <Route path="/empowerment/compassion-care" element={<CompassionCare />} />
+            <Route path="/empowerment/resilience-antifrailty" element={<ResilienceAntiFragility />} />
+            <Route path="/empowerment/quiet-intelligence" element={<QuietIntelligence />} />
+            <Route path="/empowerment/intergenerational-engine" element={<IntergenerationalEngine />} />
+            <Route path="/empowerment/coherence-architecture" element={<CoherenceArchitecture />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
