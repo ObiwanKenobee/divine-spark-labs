@@ -250,18 +250,23 @@ export default function Onboarding() {
         throw new Error("No tenant found");
       }
 
-      // Call workspace provisioning function
-      const { data, error } = await supabase.functions.invoke("provision-workspace", {
-        body: {
-          tenantId: profile.tenant_id,
+      // Create workspace directly
+      const workspaceSlug = workspaceName.toLowerCase().replace(/\s+/g, '-');
+      const { data: workspace, error: wsError } = await supabase
+        .from("workspaces")
+        .insert({
+          tenant_id: profile.tenant_id,
           name: workspaceName,
-          slug: workspaceName.toLowerCase().replace(/\s+/g, '-'),
+          slug: workspaceSlug,
           description: workspaceDescription,
-          dataClassification: dataClassification
-        }
-      });
+          data_classification: dataClassification,
+          created_by: user.id,
+          status: "active"
+        })
+        .select("id")
+        .single();
 
-      if (error) throw error;
+      if (wsError) throw wsError;
 
       // Audit log: workspace provisioned via onboarding
       try {
