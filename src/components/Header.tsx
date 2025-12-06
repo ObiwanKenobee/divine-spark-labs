@@ -88,17 +88,21 @@ export default function Header() {
                   </DropdownMenu.Trigger>
 
                   <DropdownMenu.Portal>
-                    <DropdownMenu.Content sideOffset={8} align="end" className="absolute right-0 mt-3 w-80 bg-white border rounded-lg shadow-lg p-2 max-h-64 overflow-auto scrollbar-thin">
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/about')}>About</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/mission')}>Mission & Governance</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/women')}>Women’s Empowerment</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/labs')}>Age‑Group Labs</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/mentorship')}>Mentorship & Collaboration</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/innovation')}>Innovation Cloud</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/learning')}>Learning & Research</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/faith')}>Faith & Philosophy</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/partnerships')}>Partnerships & Investment</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/legal')}>Legal & Transparency</DropdownMenu.Item>
+                    <DropdownMenu.Content sideOffset={8} align="end" className="absolute right-0 mt-3 w-80 bg-white border rounded-lg shadow-lg overflow-hidden">
+                      <ScrollArea className="h-auto max-h-64">
+                        <div className="p-2">
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/about')}>About</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/mission')}>Mission & Governance</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/women')}>Women's Empowerment</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/labs')}>Age Group Labs</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/mentorship')}>Mentorship & Collaboration</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/innovation')}>Innovation Cloud</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/learning')}>Learning & Research</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/faith')}>Faith & Philosophy</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/partnerships')}>Partnerships & Investment</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/legal')}>Legal & Transparency</DropdownMenu.Item>
+                        </div>
+                      </ScrollArea>
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
@@ -202,8 +206,8 @@ export default function Header() {
               <div className="text-xs uppercase text-slate-500 px-3 mb-1">Explore</div>
               <button onClick={() => { navigate('/about'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">About</button>
               <button onClick={() => { navigate('/mission'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Mission & Governance</button>
-              <button onClick={() => { navigate('/women'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Women’s Empowerment</button>
-              <button onClick={() => { navigate('/labs'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Age‑Group Labs</button>
+              <button onClick={() => { navigate('/women'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Women's Empowerment</button>
+              <button onClick={() => { navigate('/labs'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Age Group Labs</button>
               <button onClick={() => { navigate('/mentorship'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Mentorship & Collaboration</button>
               <button onClick={() => { navigate('/innovation'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Innovation Cloud</button>
               <button onClick={() => { navigate('/learning'); setMobileOpen(false); }} className="block py-2 px-3 rounded hover:bg-slate-50 text-left">Learning & Research</button>
