@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Search, Globe } from "lucide-react";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function Header() {
@@ -115,11 +116,15 @@ export default function Header() {
                   </DropdownMenu.Trigger>
 
                   <DropdownMenu.Portal>
-                    <DropdownMenu.Content sideOffset={8} align="end" className="absolute right-0 mt-3 w-72 bg-white border rounded-lg shadow-lg p-2 max-h-64 overflow-auto scrollbar-thin">
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#discernment-api')}>Discernment API</DropdownMenu.Item>
-                        <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#wisdomgraph')}>Wisdom Graph</DropdownMenu.Item>
-                        <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#impact-cloud')}>Impact Cloud</DropdownMenu.Item>
-                        <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#ethicsops')}>EthicsOps</DropdownMenu.Item>
+                    <DropdownMenu.Content sideOffset={8} align="end" className="absolute right-0 mt-3 w-72 bg-white border rounded-lg shadow-lg overflow-hidden">
+                      <ScrollArea className="h-auto max-h-64">
+                        <div className="p-2">
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#discernment-api')}>Discernment API</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#wisdomgraph')}>Wisdom Graph</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#impact-cloud')}>Impact Cloud</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/solutions#ethicsops')}>EthicsOps</DropdownMenu.Item>
+                        </div>
+                      </ScrollArea>
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
@@ -158,11 +163,15 @@ export default function Header() {
                     <button aria-label="User menu" className="hidden sm:inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent font-semibold">JM</button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
-                    <DropdownMenu.Content sideOffset={6} align="end" className="absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg p-2 max-h-64 overflow-auto scrollbar-thin">
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/auth?provider=google')}>Sign in with Google</DropdownMenu.Item>
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/auth')}>Sign in with Email</DropdownMenu.Item>
-                      <DropdownMenu.Separator className="my-1" />
-                      <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/onboarding')}>Create Account</DropdownMenu.Item>
+                    <DropdownMenu.Content sideOffset={6} align="end" className="absolute right-0 mt-3 w-48 bg-white border rounded-lg shadow-lg overflow-hidden">
+                      <ScrollArea className="h-auto max-h-64">
+                        <div className="p-2">
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/auth?provider=google')}>Sign in with Google</DropdownMenu.Item>
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/auth')}>Sign in with Email</DropdownMenu.Item>
+                          <DropdownMenu.Separator className="my-1" />
+                          <DropdownMenu.Item className="px-3 py-2 text-sm hover:bg-slate-50 rounded" onSelect={() => navigate('/onboarding')}>Create Account</DropdownMenu.Item>
+                        </div>
+                      </ScrollArea>
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
                 </DropdownMenu.Root>
