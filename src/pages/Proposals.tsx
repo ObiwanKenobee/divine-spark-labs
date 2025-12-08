@@ -39,7 +39,7 @@ export default function Proposals() {
         try {
           const local = JSON.parse(localStorage.getItem('jmf_proposals') || '[]');
           if (mounted) setProposals(local || []);
-          toast({ title: 'Offline mode', description: 'Proposals loaded from local storage.', variant: 'warning' });
+          toast({ title: 'Offline mode', description: 'Proposals loaded from local storage.' });
         } catch (err) {
           console.error('Failed to load proposals from localStorage', err);
           if (mounted) setProposals([]);
@@ -105,7 +105,7 @@ export default function Proposals() {
       localStorage.setItem('jmf_proposals', JSON.stringify(existing));
       setProposals((p) => [record, ...p]);
       setTitle(''); setSummary(''); setSector(''); setRegion(''); setRequestedAmount('');
-      toast({ title: 'Saved locally', description: 'Proposal saved locally and will be sent when the server is available.', variant: 'warning' });
+      toast({ title: 'Saved locally', description: 'Proposal saved locally and will be sent when the server is available.' });
     } catch (e) {
       console.error('Failed to save proposal locally', e);
       toast({ title: 'Error', description: 'Could not submit proposal. Try again later.', variant: 'destructive' });
