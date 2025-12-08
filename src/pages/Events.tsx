@@ -3,9 +3,10 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 type EventItem = { id: string; title: string; date?: string; description?: string; location?: string };
 
@@ -37,7 +38,43 @@ const Events = () => {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    load(); 
+    
+    // Set up real-time subscription
+    const channel: RealtimeChannel = supabase
+      .channel('events-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'events' },
+        (payload) => {
+          const newEvent = payload.new as EventItem;
+          setEvents((prev) => [newEvent, ...prev]);
+          toast({ title: "New Event", description: `"${newEvent.title}" was just added!` });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'events' },
+        (payload) => {
+          const updated = payload.new as EventItem;
+          setEvents((prev) => prev.map((e) => e.id === updated.id ? updated : e));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'events' },
+        (payload) => {
+          const deleted = payload.old as { id: string };
+          setEvents((prev) => prev.filter((e) => e.id !== deleted.id));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const createEvent = async () => {
     if (!title.trim() || !date.trim()) {

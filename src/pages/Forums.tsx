@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 type Topic = { id: string; title: string; content: string; created_at?: string };
 
@@ -35,7 +36,43 @@ const Forums = () => {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { 
+    load(); 
+    
+    // Set up real-time subscription
+    const channel: RealtimeChannel = supabase
+      .channel('forums-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'forums' },
+        (payload) => {
+          const newTopic = payload.new as Topic;
+          setTopics((prev) => [newTopic, ...prev]);
+          toast({ title: "New Topic", description: `"${newTopic.title}" was just posted!` });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'forums' },
+        (payload) => {
+          const updated = payload.new as Topic;
+          setTopics((prev) => prev.map((t) => t.id === updated.id ? updated : t));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'forums' },
+        (payload) => {
+          const deleted = payload.old as { id: string };
+          setTopics((prev) => prev.filter((t) => t.id !== deleted.id));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const createTopic = async () => {
     if (!title.trim() || !content.trim()) {
