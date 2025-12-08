@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, FileText, Users } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 const samplePartnerships = [
   { id: 'p1', name: 'Regenerative Ag Network', sector: 'Agriculture', region: 'Africa', lat: -1.286389, lng: 36.817223, status: 'active' },
@@ -39,7 +40,41 @@ export default function Partnerships() {
     };
 
     fetchPartnerships();
-    return () => { mounted = false; };
+
+    // Set up real-time subscription
+    const channel: RealtimeChannel = supabase
+      .channel('partnerships-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'partnerships' },
+        (payload) => {
+          const newPartnership = payload.new as any;
+          setPartnerships((prev) => [newPartnership, ...prev]);
+          toast({ title: "New Partnership", description: `"${newPartnership.name}" was just added!` });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'partnerships' },
+        (payload) => {
+          const updated = payload.new as any;
+          setPartnerships((prev) => prev.map((p) => p.id === updated.id ? updated : p));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'partnerships' },
+        (payload) => {
+          const deleted = payload.old as { id: string };
+          setPartnerships((prev) => prev.filter((p) => p.id !== deleted.id));
+        }
+      )
+      .subscribe();
+
+    return () => { 
+      mounted = false; 
+      supabase.removeChannel(channel);
+    };
   }, [toast]);
 
   return (
