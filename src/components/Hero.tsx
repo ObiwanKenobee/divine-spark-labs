@@ -9,13 +9,13 @@ const Hero = () => {
   const [open, setOpen] = useState(false);
   const [sparkKey, setSparkKey] = useState(0);
   const { toast } = useToast();
-  const [metric, setMetric] = useState(8.0);
+  const [metric, setMetric] = useState(1.0);
 
   useEffect(() => {
     let raf = 0;
     const start = performance.now();
-    const from = 8.0;
-    const to = 8.2;
+    const from = 1.0;
+    const to = 1.0;
     const dur = 1800;
     const tick = (t: number) => {
       const p = Math.min(1, (t - start) / dur);
