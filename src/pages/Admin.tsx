@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,10 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
-import { Users, Activity, Key, Building2, MessageSquare, Calendar, Handshake, Trash2, Pencil } from "lucide-react";
+import { Users, Activity, Key, Building2, MessageSquare, Calendar, Handshake, Trash2, Pencil, Search, X } from "lucide-react";
 
 type ForumTopic = { id: string; title: string; content: string; user_id: string | null; created_at: string };
 type EventItem = { id: string; title: string; description: string | null; date: string; location: string | null; user_id: string | null; created_at: string };
@@ -34,6 +35,80 @@ const Admin = () => {
   const [editingForum, setEditingForum] = useState<ForumTopic | null>(null);
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const [editingPartnership, setEditingPartnership] = useState<Partnership | null>(null);
+
+  // Search and filter states
+  const [forumSearch, setForumSearch] = useState("");
+  const [eventSearch, setEventSearch] = useState("");
+  const [partnershipSearch, setPartnershipSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
+  const [orgSearch, setOrgSearch] = useState("");
+  const [auditSearch, setAuditSearch] = useState("");
+  const [subscriberSearch, setSubscriberSearch] = useState("");
+
+  // Filter states
+  const [partnershipSectorFilter, setPartnershipSectorFilter] = useState("all");
+  const [partnershipStatusFilter, setPartnershipStatusFilter] = useState("all");
+  const [subscriberStatusFilter, setSubscriberStatusFilter] = useState("all");
+  const [auditActionFilter, setAuditActionFilter] = useState("all");
+
+  // Memoized filter options
+  const partnershipSectors = useMemo(() => [...new Set(partnerships.map(p => p.sector))], [partnerships]);
+  const partnershipStatuses = useMemo(() => [...new Set(partnerships.map(p => p.status || 'active'))], [partnerships]);
+  const auditActions = useMemo(() => [...new Set(auditLogs.map(l => l.action))], [auditLogs]);
+
+  // Filtered data
+  const filteredForums = useMemo(() => 
+    forums.filter(f => 
+      f.title.toLowerCase().includes(forumSearch.toLowerCase()) ||
+      f.content.toLowerCase().includes(forumSearch.toLowerCase())
+    ), [forums, forumSearch]);
+
+  const filteredEvents = useMemo(() => 
+    events.filter(e => 
+      e.title.toLowerCase().includes(eventSearch.toLowerCase()) ||
+      (e.location || '').toLowerCase().includes(eventSearch.toLowerCase()) ||
+      (e.description || '').toLowerCase().includes(eventSearch.toLowerCase())
+    ), [events, eventSearch]);
+
+  const filteredPartnerships = useMemo(() => 
+    partnerships.filter(p => {
+      const matchesSearch = p.name.toLowerCase().includes(partnershipSearch.toLowerCase()) ||
+        p.sector.toLowerCase().includes(partnershipSearch.toLowerCase()) ||
+        p.region.toLowerCase().includes(partnershipSearch.toLowerCase());
+      const matchesSector = partnershipSectorFilter === "all" || p.sector === partnershipSectorFilter;
+      const matchesStatus = partnershipStatusFilter === "all" || (p.status || 'active') === partnershipStatusFilter;
+      return matchesSearch && matchesSector && matchesStatus;
+    }), [partnerships, partnershipSearch, partnershipSectorFilter, partnershipStatusFilter]);
+
+  const filteredUsers = useMemo(() => 
+    users.filter(u => 
+      (u.full_name || '').toLowerCase().includes(userSearch.toLowerCase()) ||
+      (u.user_id || '').toLowerCase().includes(userSearch.toLowerCase())
+    ), [users, userSearch]);
+
+  const filteredOrganizations = useMemo(() => 
+    organizations.filter(o => 
+      o.name.toLowerCase().includes(orgSearch.toLowerCase()) ||
+      o.slug.toLowerCase().includes(orgSearch.toLowerCase())
+    ), [organizations, orgSearch]);
+
+  const filteredAuditLogs = useMemo(() => 
+    auditLogs.filter(l => {
+      const matchesSearch = l.action.toLowerCase().includes(auditSearch.toLowerCase()) ||
+        (l.resource_type || '').toLowerCase().includes(auditSearch.toLowerCase());
+      const matchesAction = auditActionFilter === "all" || l.action === auditActionFilter;
+      return matchesSearch && matchesAction;
+    }), [auditLogs, auditSearch, auditActionFilter]);
+
+  const filteredSubscribers = useMemo(() => 
+    subscribers.filter(s => {
+      const matchesSearch = s.email.toLowerCase().includes(subscriberSearch.toLowerCase()) ||
+        (s.plan || '').toLowerCase().includes(subscriberSearch.toLowerCase());
+      const matchesStatus = subscriberStatusFilter === "all" || 
+        (subscriberStatusFilter === "active" && !s.unsubscribed_at) ||
+        (subscriberStatusFilter === "unsubscribed" && s.unsubscribed_at);
+      return matchesSearch && matchesStatus;
+    }), [subscribers, subscriberSearch, subscriberStatusFilter]);
 
   useEffect(() => {
     if (!roleLoading && !isAdmin) {
@@ -291,6 +366,23 @@ const Admin = () => {
                 <CardDescription>Moderate and manage forum discussions</CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search forums..."
+                      value={forumSearch}
+                      onChange={(e) => setForumSearch(e.target.value)}
+                      className="pl-9"
+                    />
+                    {forumSearch && (
+                      <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => setForumSearch("")}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <span className="text-sm text-muted-foreground">{filteredForums.length} of {forums.length}</span>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -301,7 +393,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {forums.map((topic) => (
+                    {filteredForums.map((topic) => (
                       <TableRow key={topic.id}>
                         <TableCell className="font-medium">{topic.title}</TableCell>
                         <TableCell className="max-w-xs truncate text-muted-foreground">{topic.content}</TableCell>
@@ -318,8 +410,8 @@ const Admin = () => {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {forums.length === 0 && (
-                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No forum topics</TableCell></TableRow>
+                    {filteredForums.length === 0 && (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No forum topics found</TableCell></TableRow>
                     )}
                   </TableBody>
                 </Table>
@@ -335,6 +427,23 @@ const Admin = () => {
                 <CardDescription>Manage platform events and gatherings</CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search events..."
+                      value={eventSearch}
+                      onChange={(e) => setEventSearch(e.target.value)}
+                      className="pl-9"
+                    />
+                    {eventSearch && (
+                      <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => setEventSearch("")}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <span className="text-sm text-muted-foreground">{filteredEvents.length} of {events.length}</span>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -345,7 +454,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {events.map((event) => (
+                    {filteredEvents.map((event) => (
                       <TableRow key={event.id}>
                         <TableCell className="font-medium">{event.title}</TableCell>
                         <TableCell>{new Date(event.date).toLocaleDateString()}</TableCell>
@@ -362,8 +471,8 @@ const Admin = () => {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {events.length === 0 && (
-                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No events</TableCell></TableRow>
+                    {filteredEvents.length === 0 && (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No events found</TableCell></TableRow>
                     )}
                   </TableBody>
                 </Table>
@@ -379,6 +488,41 @@ const Admin = () => {
                 <CardDescription>Manage partnership collaborations</CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="relative flex-1 min-w-[200px] max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search partnerships..."
+                      value={partnershipSearch}
+                      onChange={(e) => setPartnershipSearch(e.target.value)}
+                      className="pl-9"
+                    />
+                    {partnershipSearch && (
+                      <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => setPartnershipSearch("")}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <Select value={partnershipSectorFilter} onValueChange={setPartnershipSectorFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Sector" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Sectors</SelectItem>
+                      {partnershipSectors.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <Select value={partnershipStatusFilter} onValueChange={setPartnershipStatusFilter}>
+                    <SelectTrigger className="w-[130px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      {partnershipStatuses.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm text-muted-foreground">{filteredPartnerships.length} of {partnerships.length}</span>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -390,7 +534,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {partnerships.map((p) => (
+                    {filteredPartnerships.map((p) => (
                       <TableRow key={p.id}>
                         <TableCell className="font-medium">{p.name}</TableCell>
                         <TableCell>{p.sector}</TableCell>
@@ -408,8 +552,8 @@ const Admin = () => {
                         </TableCell>
                       </TableRow>
                     ))}
-                    {partnerships.length === 0 && (
-                      <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No partnerships</TableCell></TableRow>
+                    {filteredPartnerships.length === 0 && (
+                      <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground">No partnerships found</TableCell></TableRow>
                     )}
                   </TableBody>
                 </Table>
@@ -424,6 +568,23 @@ const Admin = () => {
                 <CardDescription>Manage all registered users and their roles</CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search users..."
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                      className="pl-9"
+                    />
+                    {userSearch && (
+                      <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => setUserSearch("")}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <span className="text-sm text-muted-foreground">{filteredUsers.length} of {users.length}</span>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -434,7 +595,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {users.map((user) => (
+                    {filteredUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>{user.full_name || 'N/A'}</TableCell>
                         <TableCell className="text-xs">{user.user_id?.substring(0, 12)}...</TableCell>
@@ -448,6 +609,9 @@ const Admin = () => {
                         <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                       </TableRow>
                     ))}
+                    {filteredUsers.length === 0 && (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No users found</TableCell></TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -461,6 +625,23 @@ const Admin = () => {
                 <CardDescription>Manage all organizations and their members</CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search organizations..."
+                      value={orgSearch}
+                      onChange={(e) => setOrgSearch(e.target.value)}
+                      className="pl-9"
+                    />
+                    {orgSearch && (
+                      <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => setOrgSearch("")}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <span className="text-sm text-muted-foreground">{filteredOrganizations.length} of {organizations.length}</span>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -471,7 +652,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {organizations.map((org) => (
+                    {filteredOrganizations.map((org) => (
                       <TableRow key={org.id}>
                         <TableCell className="font-medium">{org.name}</TableCell>
                         <TableCell>{org.slug}</TableCell>
@@ -479,6 +660,9 @@ const Admin = () => {
                         <TableCell>{new Date(org.created_at).toLocaleDateString()}</TableCell>
                       </TableRow>
                     ))}
+                    {filteredOrganizations.length === 0 && (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No organizations found</TableCell></TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -492,6 +676,32 @@ const Admin = () => {
                 <CardDescription>View all system activity and events</CardDescription>
               </CardHeader>
               <CardContent>
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="relative flex-1 min-w-[200px] max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search audit logs..."
+                      value={auditSearch}
+                      onChange={(e) => setAuditSearch(e.target.value)}
+                      className="pl-9"
+                    />
+                    {auditSearch && (
+                      <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => setAuditSearch("")}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <Select value={auditActionFilter} onValueChange={setAuditActionFilter}>
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue placeholder="Action" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Actions</SelectItem>
+                      {auditActions.map(a => <SelectItem key={a} value={a}>{a}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm text-muted-foreground">{filteredAuditLogs.length} of {auditLogs.length}</span>
+                </div>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -502,7 +712,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {auditLogs.map((log) => (
+                    {filteredAuditLogs.map((log) => (
                       <TableRow key={log.id}>
                         <TableCell><Badge>{log.action}</Badge></TableCell>
                         <TableCell>
@@ -512,6 +722,9 @@ const Admin = () => {
                         <TableCell className="text-sm">{new Date(log.created_at).toLocaleString()}</TableCell>
                       </TableRow>
                     ))}
+                    {filteredAuditLogs.length === 0 && (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No audit logs found</TableCell></TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -525,7 +738,32 @@ const Admin = () => {
                 <CardDescription>Manage newsletter subscribers and exports</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex justify-end mb-4">
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <div className="relative flex-1 min-w-[200px] max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search subscribers..."
+                      value={subscriberSearch}
+                      onChange={(e) => setSubscriberSearch(e.target.value)}
+                      className="pl-9"
+                    />
+                    {subscriberSearch && (
+                      <Button variant="ghost" size="sm" className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0" onClick={() => setSubscriberSearch("")}>
+                        <X className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <Select value={subscriberStatusFilter} onValueChange={setSubscriberStatusFilter}>
+                    <SelectTrigger className="w-[140px]">
+                      <SelectValue placeholder="Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <span className="text-sm text-muted-foreground">{filteredSubscribers.length} of {subscribers.length}</span>
                   <Button onClick={async () => {
                     try {
                       const { data } = await supabase.from('newsletter_subscribers').select('*').order('subscribed_at', { ascending: false });
@@ -557,7 +795,7 @@ const Admin = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {subscribers.map((s) => (
+                    {filteredSubscribers.map((s) => (
                       <TableRow key={s.id}>
                         <TableCell className="font-medium">{s.email}</TableCell>
                         <TableCell>{s.plan || '-'}</TableCell>
@@ -565,6 +803,9 @@ const Admin = () => {
                         <TableCell>{s.unsubscribed_at ? <Badge variant="secondary">Unsubscribed</Badge> : <Badge>Active</Badge>}</TableCell>
                       </TableRow>
                     ))}
+                    {filteredSubscribers.length === 0 && (
+                      <TableRow><TableCell colSpan={4} className="text-center text-muted-foreground">No subscribers found</TableCell></TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </CardContent>
