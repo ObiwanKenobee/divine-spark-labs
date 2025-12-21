@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { usePagination } from "@/hooks/usePagination";
@@ -34,6 +35,7 @@ export const RoleManagement = () => {
   
   // Dialog states
   const [addRoleDialog, setAddRoleDialog] = useState<{ open: boolean; user: UserWithRoles | null }>({ open: false, user: null });
+  const [removeRoleDialog, setRemoveRoleDialog] = useState<{ open: boolean; userId: string; roleId: string; roleName: string; userName: string } | null>(null);
   const [selectedRole, setSelectedRole] = useState<AppRole>("member");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -131,28 +133,34 @@ export const RoleManagement = () => {
     }
   };
 
-  const removeRole = async (userId: string, roleId: string, roleName: string) => {
+  const confirmRemoveRole = async () => {
+    if (!removeRoleDialog) return;
+    
+    setIsSubmitting(true);
     try {
-      const { error } = await supabase.from("user_roles").delete().eq("id", roleId);
+      const { error } = await supabase.from("user_roles").delete().eq("id", removeRoleDialog.roleId);
 
       if (error) throw error;
 
       // Update local state
       setUsers((prev) =>
         prev.map((u) =>
-          u.user_id === userId
-            ? { ...u, user_roles: u.user_roles.filter((r) => r.id !== roleId) }
+          u.user_id === removeRoleDialog.userId
+            ? { ...u, user_roles: u.user_roles.filter((r) => r.id !== removeRoleDialog.roleId) }
             : u
         )
       );
 
-      toast({ title: "Role removed", description: `${roleName} role removed successfully.` });
+      toast({ title: "Role removed", description: `${removeRoleDialog.roleName} role removed successfully.` });
+      setRemoveRoleDialog(null);
     } catch (error: any) {
       toast({
         title: "Error removing role",
         description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -257,7 +265,13 @@ export const RoleManagement = () => {
                           >
                             {r.role}
                             <button
-                              onClick={() => removeRole(user.user_id, r.id, r.role)}
+                              onClick={() => setRemoveRoleDialog({ 
+                                open: true, 
+                                userId: user.user_id, 
+                                roleId: r.id, 
+                                roleName: r.role,
+                                userName: user.full_name || "this user"
+                              })}
                               className="ml-1 hover:text-destructive"
                               title="Remove role"
                             >
@@ -362,6 +376,28 @@ export const RoleManagement = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Remove Role Confirmation Dialog */}
+      <AlertDialog open={!!removeRoleDialog} onOpenChange={(open) => !open && setRemoveRoleDialog(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Role</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove the <strong>{removeRoleDialog?.roleName}</strong> role from <strong>{removeRoleDialog?.userName}</strong>? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmRemoveRole} 
+              disabled={isSubmitting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isSubmitting ? "Removing..." : "Remove Role"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
