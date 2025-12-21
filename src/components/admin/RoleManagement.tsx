@@ -11,7 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { usePagination } from "@/hooks/usePagination";
 import { PaginationControls } from "@/components/admin/AdminTableControls";
-import { Search, X, Shield, Plus, Trash2 } from "lucide-react";
+import { Search, X, Shield, Plus, Users } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -36,8 +37,11 @@ export const RoleManagement = () => {
   // Dialog states
   const [addRoleDialog, setAddRoleDialog] = useState<{ open: boolean; user: UserWithRoles | null }>({ open: false, user: null });
   const [removeRoleDialog, setRemoveRoleDialog] = useState<{ open: boolean; userId: string; roleId: string; roleName: string; userName: string } | null>(null);
+  const [bulkRoleDialog, setBulkRoleDialog] = useState(false);
   const [selectedRole, setSelectedRole] = useState<AppRole>("member");
+  const [bulkSelectedRole, setBulkSelectedRole] = useState<AppRole>("member");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -88,6 +92,20 @@ export const RoleManagement = () => {
 
   const pagination = usePagination({ data: filteredUsers });
 
+  // Audit logging helper
+  const logRoleChange = async (action: string, targetUserId: string, role: string) => {
+    try {
+      await supabase.from("audit_logs").insert({
+        action,
+        resource_type: "user_role",
+        resource_id: targetUserId,
+        metadata: { role, target_user_id: targetUserId },
+      });
+    } catch (error) {
+      console.error("Failed to log audit event:", error);
+    }
+  };
+
   const addRole = async () => {
     if (!addRoleDialog.user) return;
     
@@ -111,6 +129,9 @@ export const RoleManagement = () => {
 
       if (error) throw error;
 
+      // Log the role assignment
+      await logRoleChange("role_assigned", addRoleDialog.user.user_id, selectedRole);
+
       // Update local state
       setUsers((prev) =>
         prev.map((u) =>
@@ -133,6 +154,62 @@ export const RoleManagement = () => {
     }
   };
 
+  const bulkAssignRole = async () => {
+    if (selectedUsers.size === 0) return;
+    
+    setIsSubmitting(true);
+    const userIds = Array.from(selectedUsers);
+    let successCount = 0;
+    let skipCount = 0;
+
+    try {
+      for (const userId of userIds) {
+        const user = users.find((u) => u.user_id === userId);
+        if (!user) continue;
+        
+        // Skip if user already has this role
+        if (user.user_roles.some((r) => r.role === bulkSelectedRole)) {
+          skipCount++;
+          continue;
+        }
+
+        const { data, error } = await supabase
+          .from("user_roles")
+          .insert({ user_id: userId, role: bulkSelectedRole })
+          .select()
+          .single();
+
+        if (!error && data) {
+          await logRoleChange("role_assigned_bulk", userId, bulkSelectedRole);
+          
+          setUsers((prev) =>
+            prev.map((u) =>
+              u.user_id === userId
+                ? { ...u, user_roles: [...u.user_roles, data as UserRole] }
+                : u
+            )
+          );
+          successCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk assignment complete",
+        description: `${successCount} roles assigned${skipCount > 0 ? `, ${skipCount} skipped (already had role)` : ""}.`,
+      });
+      setBulkRoleDialog(false);
+      setSelectedUsers(new Set());
+    } catch (error: any) {
+      toast({
+        title: "Error in bulk assignment",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const confirmRemoveRole = async () => {
     if (!removeRoleDialog) return;
     
@@ -141,6 +218,9 @@ export const RoleManagement = () => {
       const { error } = await supabase.from("user_roles").delete().eq("id", removeRoleDialog.roleId);
 
       if (error) throw error;
+
+      // Log the role removal
+      await logRoleChange("role_removed", removeRoleDialog.userId, removeRoleDialog.roleName);
 
       // Update local state
       setUsers((prev) =>
@@ -161,6 +241,23 @@ export const RoleManagement = () => {
       });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const toggleUserSelection = (userId: string) => {
+    setSelectedUsers((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  };
+
+  const selectAllUsers = (checked: boolean) => {
+    if (checked) {
+      setSelectedUsers(new Set(pagination.paginatedData.map((u) => u.user_id)));
+    } else {
+      setSelectedUsers(new Set());
     }
   };
 
@@ -237,11 +334,27 @@ export const RoleManagement = () => {
             <span className="text-sm text-muted-foreground">
               {filteredUsers.length} of {users.length}
             </span>
+            {selectedUsers.size > 0 && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setBulkRoleDialog(true)}
+              >
+                <Users className="h-4 w-4 mr-1" />
+                Bulk Assign ({selectedUsers.size})
+              </Button>
+            )}
           </div>
 
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={pagination.paginatedData.length > 0 && pagination.paginatedData.every((u) => selectedUsers.has(u.user_id))}
+                    onCheckedChange={selectAllUsers}
+                  />
+                </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>User ID</TableHead>
                 <TableHead>Current Roles</TableHead>
@@ -251,7 +364,13 @@ export const RoleManagement = () => {
             </TableHeader>
             <TableBody>
               {pagination.paginatedData.map((user) => (
-                <TableRow key={user.id}>
+                <TableRow key={user.id} className={selectedUsers.has(user.user_id) ? "bg-muted/50" : ""}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedUsers.has(user.user_id)}
+                      onCheckedChange={() => toggleUserSelection(user.user_id)}
+                    />
+                  </TableCell>
                   <TableCell className="font-medium">{user.full_name || "N/A"}</TableCell>
                   <TableCell className="text-xs font-mono">{user.user_id.substring(0, 12)}...</TableCell>
                   <TableCell>
@@ -306,7 +425,7 @@ export const RoleManagement = () => {
               ))}
               {pagination.paginatedData.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
                     No users found
                   </TableCell>
                 </TableRow>
@@ -398,6 +517,46 @@ export const RoleManagement = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Bulk Role Assignment Dialog */}
+      <Dialog open={bulkRoleDialog} onOpenChange={setBulkRoleDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Bulk Role Assignment</DialogTitle>
+            <DialogDescription>
+              Assign a role to {selectedUsers.size} selected user{selectedUsers.size !== 1 ? "s" : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Select Role to Assign</label>
+              <Select value={bulkSelectedRole} onValueChange={(v) => setBulkSelectedRole(v as AppRole)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a role" />
+                </SelectTrigger>
+                <SelectContent>
+                  {AVAILABLE_ROLES.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role.charAt(0).toUpperCase() + role.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Users who already have this role will be skipped.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkRoleDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={bulkAssignRole} disabled={isSubmitting}>
+              {isSubmitting ? "Assigning..." : `Assign to ${selectedUsers.size} Users`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
