@@ -1100,6 +1100,11 @@ export type Database = {
         }
         Returns: string
       }
+      get_user_admin_tenant_ids: {
+        Args: { _user_id: string }
+        Returns: string[]
+      }
+      get_user_tenant_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1108,6 +1113,14 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_tenant_admin: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_tenant_member: {
+        Args: { _tenant_id: string; _user_id: string }
+        Returns: boolean
+      }
       log_audit_event: {
         Args: {
           _action: string
