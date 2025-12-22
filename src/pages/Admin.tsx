@@ -18,6 +18,7 @@ import { PaginationControls, BulkActionsBar, exportToCSV } from "@/components/ad
 import { Users, Activity, Key, Building2, MessageSquare, Calendar, Handshake, Trash2, Pencil, Search, X, Shield, History } from "lucide-react";
 import { RoleManagement } from "@/components/admin/RoleManagement";
 import { RoleAuditLogViewer } from "@/components/admin/RoleAuditLogViewer";
+import { RoleRequestsAdmin } from "@/components/admin/RoleRequests";
 
 type ForumTopic = { id: string; title: string; content: string; user_id: string | null; created_at: string };
 type EventItem = { id: string; title: string; description: string | null; date: string; location: string | null; user_id: string | null; created_at: string };
@@ -496,6 +497,7 @@ const Admin = () => {
             <TabsTrigger value="partnerships">Partnerships</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="roles">Role Management</TabsTrigger>
+            <TabsTrigger value="role-requests">Role Requests</TabsTrigger>
             <TabsTrigger value="role-audit">Role History</TabsTrigger>
             <TabsTrigger value="organizations">Organizations</TabsTrigger>
             <TabsTrigger value="audit">Audit Logs</TabsTrigger>
@@ -867,6 +869,11 @@ const Admin = () => {
           {/* Role Management Tab */}
           <TabsContent value="roles" className="space-y-4">
             <RoleManagement />
+          </TabsContent>
+
+          {/* Role Requests Tab */}
+          <TabsContent value="role-requests" className="space-y-4">
+            <RoleRequestsAdmin />
           </TabsContent>
 
           {/* Role Audit Log Tab */}

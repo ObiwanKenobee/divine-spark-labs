@@ -11,16 +11,20 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { usePagination } from "@/hooks/usePagination";
 import { PaginationControls } from "@/components/admin/AdminTableControls";
-import { Search, X, Shield, Plus, Users } from "lucide-react";
+import { Search, X, Shield, Plus, Users, Clock } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format, addDays, addWeeks, addMonths } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
-type UserRole = { id: string; user_id: string; role: AppRole; created_at: string };
+type UserRole = { id: string; user_id: string; role: AppRole; created_at: string; expires_at: string | null };
 type UserWithRoles = {
   id: string;
   user_id: string;
   full_name: string | null;
+  email: string | null;
   created_at: string;
   user_roles: UserRole[];
 };
@@ -42,13 +46,15 @@ export const RoleManagement = () => {
   const [bulkSelectedRole, setBulkSelectedRole] = useState<AppRole>("member");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
+  const [expirationDate, setExpirationDate] = useState<Date | undefined>(undefined);
+  const [bulkExpirationDate, setBulkExpirationDate] = useState<Date | undefined>(undefined);
 
   const fetchUsers = useCallback(async () => {
     try {
       // Fetch profiles and roles separately since there's no direct FK relation
       const [profilesRes, rolesRes] = await Promise.all([
-        supabase.from("profiles").select("id, user_id, full_name, created_at").order("created_at", { ascending: false }),
-        supabase.from("user_roles").select("id, user_id, role, created_at"),
+        supabase.from("profiles").select("id, user_id, full_name, email, created_at").order("created_at", { ascending: false }),
+        supabase.from("user_roles").select("id, user_id, role, created_at, expires_at"),
       ]);
 
       if (profilesRes.error) throw profilesRes.error;
@@ -116,12 +122,16 @@ export const RoleManagement = () => {
     role: string,
     changedByName: string
   ) => {
+    // Only send if user has email
+    if (!targetUser.email) {
+      console.log("No email for user, skipping notification");
+      return;
+    }
+    
     try {
-      // Get user email from auth - we need to make an API call since we don't have it
-      // For now, we'll use the user_id as reference. In production, you'd want to store email in profiles
       await supabase.functions.invoke("notify-role-change", {
         body: {
-          userEmail: `${targetUser.user_id}@placeholder.com`, // You should store email in profiles table
+          userEmail: targetUser.email,
           userName: targetUser.full_name || "User",
           action,
           role,
@@ -130,7 +140,6 @@ export const RoleManagement = () => {
       });
     } catch (error) {
       console.error("Failed to send role change notification:", error);
-      // Don't throw - notification failure shouldn't block the role change
     }
   };
 
@@ -177,9 +186,18 @@ export const RoleManagement = () => {
 
     setIsSubmitting(true);
     try {
+      const insertData: { user_id: string; role: AppRole; expires_at?: string } = {
+        user_id: addRoleDialog.user.user_id,
+        role: selectedRole,
+      };
+      
+      if (expirationDate) {
+        insertData.expires_at = expirationDate.toISOString();
+      }
+
       const { data, error } = await supabase
         .from("user_roles")
-        .insert({ user_id: addRoleDialog.user.user_id, role: selectedRole })
+        .insert(insertData)
         .select()
         .single();
 
@@ -201,8 +219,10 @@ export const RoleManagement = () => {
         )
       );
 
-      toast({ title: "Role added", description: `${selectedRole} role assigned successfully.` });
+      const expiryMsg = expirationDate ? ` (expires ${format(expirationDate, "MMM d, yyyy")})` : "";
+      toast({ title: "Role added", description: `${selectedRole} role assigned successfully${expiryMsg}.` });
       setAddRoleDialog({ open: false, user: null });
+      setExpirationDate(undefined);
     } catch (error: any) {
       toast({
         title: "Error adding role",
@@ -233,9 +253,18 @@ export const RoleManagement = () => {
           continue;
         }
 
+        const insertData: { user_id: string; role: AppRole; expires_at?: string } = {
+          user_id: userId,
+          role: bulkSelectedRole,
+        };
+        
+        if (bulkExpirationDate) {
+          insertData.expires_at = bulkExpirationDate.toISOString();
+        }
+
         const { data, error } = await supabase
           .from("user_roles")
-          .insert({ user_id: userId, role: bulkSelectedRole })
+          .insert(insertData)
           .select()
           .single();
 
@@ -257,12 +286,14 @@ export const RoleManagement = () => {
         }
       }
 
+      const expiryMsg = bulkExpirationDate ? ` (expires ${format(bulkExpirationDate, "MMM d, yyyy")})` : "";
       toast({
         title: "Bulk assignment complete",
-        description: `${successCount} roles assigned${skipCount > 0 ? `, ${skipCount} skipped (already had role)` : ""}.`,
+        description: `${successCount} roles assigned${expiryMsg}${skipCount > 0 ? `, ${skipCount} skipped (already had role)` : ""}.`,
       });
       setBulkRoleDialog(false);
       setSelectedUsers(new Set());
+      setBulkExpirationDate(undefined);
     } catch (error: any) {
       toast({
         title: "Error in bulk assignment",
@@ -450,26 +481,35 @@ export const RoleManagement = () => {
                     <div className="flex flex-wrap gap-1">
                       {user.user_roles.length > 0 ? (
                         user.user_roles.map((r) => (
-                          <Badge
-                            key={r.id}
-                            variant={getRoleBadgeVariant(r.role)}
-                            className="flex items-center gap-1"
-                          >
-                            {r.role}
-                            <button
-                              onClick={() => setRemoveRoleDialog({ 
-                                open: true, 
-                                userId: user.user_id, 
-                                roleId: r.id, 
-                                roleName: r.role,
-                                userName: user.full_name || "this user"
-                              })}
-                              className="ml-1 hover:text-destructive"
-                              title="Remove role"
+                          <div key={r.id} className="flex flex-col items-start">
+                            <Badge
+                              variant={getRoleBadgeVariant(r.role)}
+                              className="flex items-center gap-1"
                             >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </Badge>
+                              {r.role}
+                              {r.expires_at && (
+                                <Clock className="h-3 w-3 ml-1 text-amber-500" />
+                              )}
+                              <button
+                                onClick={() => setRemoveRoleDialog({ 
+                                  open: true, 
+                                  userId: user.user_id, 
+                                  roleId: r.id, 
+                                  roleName: r.role,
+                                  userName: user.full_name || "this user"
+                                })}
+                                className="ml-1 hover:text-destructive"
+                                title="Remove role"
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                            </Badge>
+                            {r.expires_at && (
+                              <span className="text-xs text-amber-600 mt-0.5">
+                                Expires {format(new Date(r.expires_at), "MMM d")}
+                              </span>
+                            )}
+                          </div>
                         ))
                       ) : (
                         <span className="text-muted-foreground text-sm">No roles</span>
@@ -549,6 +589,61 @@ export const RoleManagement = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Expiration (optional)</label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExpirationDate(undefined)}
+                  className={!expirationDate ? "border-primary" : ""}
+                >
+                  Never
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExpirationDate(addDays(new Date(), 7))}
+                >
+                  1 Week
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExpirationDate(addMonths(new Date(), 1))}
+                >
+                  1 Month
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setExpirationDate(addMonths(new Date(), 3))}
+                >
+                  3 Months
+                </Button>
+              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full justify-start text-left font-normal">
+                    <Clock className="mr-2 h-4 w-4" />
+                    {expirationDate ? format(expirationDate, "PPP") : "Custom date..."}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={expirationDate}
+                    onSelect={setExpirationDate}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
             <div className="text-sm text-muted-foreground">
               <strong>Role descriptions:</strong>
               <ul className="list-disc list-inside mt-2 space-y-1">
@@ -615,6 +710,53 @@ export const RoleManagement = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Expiration (optional)</label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBulkExpirationDate(undefined)}
+                  className={!bulkExpirationDate ? "border-primary" : ""}
+                >
+                  Never
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBulkExpirationDate(addDays(new Date(), 7))}
+                >
+                  1 Week
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setBulkExpirationDate(addMonths(new Date(), 1))}
+                >
+                  1 Month
+                </Button>
+              </div>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full justify-start text-left font-normal">
+                    <Clock className="mr-2 h-4 w-4" />
+                    {bulkExpirationDate ? format(bulkExpirationDate, "PPP") : "Custom date..."}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={bulkExpirationDate}
+                    onSelect={setBulkExpirationDate}
+                    disabled={(date) => date < new Date()}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <p className="text-sm text-muted-foreground">
               Users who already have this role will be skipped.
