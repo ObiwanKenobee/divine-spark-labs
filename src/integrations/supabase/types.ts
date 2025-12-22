@@ -613,6 +613,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email: string | null
           full_name: string | null
           id: string
           onboarding_completed: boolean | null
@@ -623,6 +624,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
           onboarding_completed?: boolean | null
@@ -633,6 +635,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email?: string | null
           full_name?: string | null
           id?: string
           onboarding_completed?: boolean | null
@@ -778,6 +781,45 @@ export type Database = {
           },
         ]
       }
+      role_requests: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string
+          requested_role: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason: string
+          requested_role: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string
+          requested_role?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tenant_members: {
         Row: {
           id: string
@@ -900,18 +942,21 @@ export type Database = {
       user_roles: {
         Row: {
           created_at: string
+          expires_at: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string
+          expires_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string
+          expires_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
@@ -1089,6 +1134,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      expire_temporary_roles: { Args: never; Returns: undefined }
       generate_event_hash: {
         Args: {
           p_action: string
