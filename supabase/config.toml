@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.provision-workspace]
 verify_jwt = true
+
+[functions.notify-role-change]
+verify_jwt = false

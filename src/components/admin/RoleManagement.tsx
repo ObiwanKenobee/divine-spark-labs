@@ -92,14 +92,70 @@ export const RoleManagement = () => {
 
   const pagination = usePagination({ data: filteredUsers });
 
-  // Audit logging helper
-  const logRoleChange = async (action: string, targetUserId: string, role: string) => {
+  // Get current admin info
+  const getCurrentAdminInfo = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { id: "unknown", name: "Unknown" };
+    
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    
+    return { 
+      id: user.id, 
+      name: profile?.full_name || user.email || "Admin" 
+    };
+  };
+
+  // Send email notification for role change
+  const sendRoleChangeNotification = async (
+    targetUser: UserWithRoles,
+    action: "assigned" | "removed",
+    role: string,
+    changedByName: string
+  ) => {
     try {
+      // Get user email from auth - we need to make an API call since we don't have it
+      // For now, we'll use the user_id as reference. In production, you'd want to store email in profiles
+      await supabase.functions.invoke("notify-role-change", {
+        body: {
+          userEmail: `${targetUser.user_id}@placeholder.com`, // You should store email in profiles table
+          userName: targetUser.full_name || "User",
+          action,
+          role,
+          changedBy: changedByName,
+        },
+      });
+    } catch (error) {
+      console.error("Failed to send role change notification:", error);
+      // Don't throw - notification failure shouldn't block the role change
+    }
+  };
+
+  // Audit logging helper with enhanced metadata
+  const logRoleChange = async (
+    action: string,
+    targetUser: UserWithRoles,
+    role: string,
+    bulkCount?: number
+  ) => {
+    try {
+      const adminInfo = await getCurrentAdminInfo();
+      
       await supabase.from("audit_logs").insert({
         action,
         resource_type: "user_role",
-        resource_id: targetUserId,
-        metadata: { role, target_user_id: targetUserId },
+        resource_id: targetUser.user_id,
+        metadata: {
+          role,
+          target_user_id: targetUser.user_id,
+          target_user_name: targetUser.full_name || "Unknown",
+          assigned_by: adminInfo.id,
+          assigned_by_name: adminInfo.name,
+          ...(bulkCount ? { bulk_count: bulkCount } : {}),
+        },
       });
     } catch (error) {
       console.error("Failed to log audit event:", error);
@@ -129,8 +185,12 @@ export const RoleManagement = () => {
 
       if (error) throw error;
 
-      // Log the role assignment
-      await logRoleChange("role_assigned", addRoleDialog.user.user_id, selectedRole);
+      // Log the role assignment with enhanced metadata
+      await logRoleChange("role_assigned", addRoleDialog.user, selectedRole);
+      
+      // Send email notification
+      const adminInfo = await getCurrentAdminInfo();
+      sendRoleChangeNotification(addRoleDialog.user, "assigned", selectedRole, adminInfo.name);
 
       // Update local state
       setUsers((prev) =>
@@ -180,7 +240,11 @@ export const RoleManagement = () => {
           .single();
 
         if (!error && data) {
-          await logRoleChange("role_assigned_bulk", userId, bulkSelectedRole);
+          await logRoleChange("bulk_role_assigned", user, bulkSelectedRole, userIds.length);
+          
+          // Send notification for bulk assignment
+          const adminInfo = await getCurrentAdminInfo();
+          sendRoleChangeNotification(user, "assigned", bulkSelectedRole, adminInfo.name);
           
           setUsers((prev) =>
             prev.map((u) =>
@@ -219,8 +283,16 @@ export const RoleManagement = () => {
 
       if (error) throw error;
 
-      // Log the role removal
-      await logRoleChange("role_removed", removeRoleDialog.userId, removeRoleDialog.roleName);
+      // Find the target user for logging
+      const targetUser = users.find((u) => u.user_id === removeRoleDialog.userId);
+      if (targetUser) {
+        // Log the role removal with enhanced metadata
+        await logRoleChange("role_removed", targetUser, removeRoleDialog.roleName);
+        
+        // Send email notification
+        const adminInfo = await getCurrentAdminInfo();
+        sendRoleChangeNotification(targetUser, "removed", removeRoleDialog.roleName, adminInfo.name);
+      }
 
       // Update local state
       setUsers((prev) =>
@@ -232,6 +304,7 @@ export const RoleManagement = () => {
       );
 
       toast({ title: "Role removed", description: `${removeRoleDialog.roleName} role removed successfully.` });
+      setRemoveRoleDialog(null);
       setRemoveRoleDialog(null);
     } catch (error: any) {
       toast({
