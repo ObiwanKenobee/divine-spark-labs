@@ -15,8 +15,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { usePagination } from "@/hooks/usePagination";
 import { PaginationControls, BulkActionsBar, exportToCSV } from "@/components/admin/AdminTableControls";
-import { Users, Activity, Key, Building2, MessageSquare, Calendar, Handshake, Trash2, Pencil, Search, X, Shield } from "lucide-react";
+import { Users, Activity, Key, Building2, MessageSquare, Calendar, Handshake, Trash2, Pencil, Search, X, Shield, History } from "lucide-react";
 import { RoleManagement } from "@/components/admin/RoleManagement";
+import { RoleAuditLogViewer } from "@/components/admin/RoleAuditLogViewer";
 
 type ForumTopic = { id: string; title: string; content: string; user_id: string | null; created_at: string };
 type EventItem = { id: string; title: string; description: string | null; date: string; location: string | null; user_id: string | null; created_at: string };
@@ -495,6 +496,7 @@ const Admin = () => {
             <TabsTrigger value="partnerships">Partnerships</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="roles">Role Management</TabsTrigger>
+            <TabsTrigger value="role-audit">Role History</TabsTrigger>
             <TabsTrigger value="organizations">Organizations</TabsTrigger>
             <TabsTrigger value="audit">Audit Logs</TabsTrigger>
             <TabsTrigger value="subscribers">Subscribers</TabsTrigger>
@@ -865,6 +867,11 @@ const Admin = () => {
           {/* Role Management Tab */}
           <TabsContent value="roles" className="space-y-4">
             <RoleManagement />
+          </TabsContent>
+
+          {/* Role Audit Log Tab */}
+          <TabsContent value="role-audit" className="space-y-4">
+            <RoleAuditLogViewer />
           </TabsContent>
 
           <TabsContent value="organizations" className="space-y-4">
