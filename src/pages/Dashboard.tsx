@@ -14,6 +14,7 @@ import { InstitutionalDashboard } from "./dashboards/InstitutionalDashboard";
 import { CivilizationDashboard } from "./dashboards/CivilizationDashboard";
 import { ObserverDashboard } from "./dashboards/ObserverDashboard";
 import OpenAccessSanctumDashboard from "./dashboards/OpenAccessSanctumDashboard";
+import { RoleRequestForm } from "@/components/admin/RoleRequests";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -154,6 +155,13 @@ const Dashboard = () => {
         {!isAdmin && userRole === 'fellow' && <FellowDashboard />}
         {!isAdmin && userRole === 'observer' && <ObserverDashboard />}
         {!isAdmin && !userRole && <ObserverDashboard />}
+        
+        {/* Role Request Form for non-admin users */}
+        {!isAdmin && (
+          <div className="mt-8">
+            <RoleRequestForm />
+          </div>
+        )}
       </main>
     </div>
   );
