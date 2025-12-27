@@ -110,11 +110,11 @@ export default function Onboarding() {
       // Audit log: tenant created via onboarding
       try {
         await supabase.from('audit_logs').insert({
-          tenant_id: tenant.id,
-          actor_id: user.id,
+          user_id: user.id,
           action: 'tenant.created.via_onboarding',
-          meta: JSON.stringify({ tenantName, dataResidency }),
-          created_at: new Date().toISOString()
+          resource_type: 'tenant',
+          resource_id: tenant.id,
+          metadata: { tenantName, dataResidency }
         });
       } catch (e) {
         console.warn('Failed to write audit log for tenant creation in onboarding', e);
@@ -270,12 +270,11 @@ export default function Onboarding() {
       // Audit log: workspace provisioned via onboarding
       try {
         await supabase.from('audit_logs').insert({
-          tenant_id: profile?.tenant_id,
-          workspace_id: workspace?.id || null,
-          actor_id: user.id,
+          user_id: user.id,
           action: 'workspace.provisioned.via_onboarding',
-          meta: JSON.stringify({ name: workspaceName }),
-          created_at: new Date().toISOString()
+          resource_type: 'workspace',
+          resource_id: workspace?.id || null,
+          metadata: { name: workspaceName, tenant_id: profile?.tenant_id }
         });
       } catch (e) {
         console.warn('Failed to write audit log for workspace provisioning in onboarding', e);
