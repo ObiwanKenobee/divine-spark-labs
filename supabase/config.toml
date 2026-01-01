@@ -11,3 +11,6 @@ verify_jwt = true
 
 [functions.notify-role-change]
 verify_jwt = false
+
+[functions.notify-role-request]
+verify_jwt = false

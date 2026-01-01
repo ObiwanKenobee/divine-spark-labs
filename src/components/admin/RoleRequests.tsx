@@ -5,13 +5,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { usePagination } from "@/hooks/usePagination";
 import { PaginationControls } from "@/components/admin/AdminTableControls";
-import { Search, X, Check, XCircle, Clock, RefreshCw, Send } from "lucide-react";
+import { Search, X, Check, XCircle, Clock, RefreshCw, Send, CheckCheck, XOctagon } from "lucide-react";
 import { format } from "date-fns";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -33,12 +34,37 @@ interface RoleRequest {
 
 const AVAILABLE_ROLES: AppRole[] = ["admin", "member", "viewer"];
 
+// Helper function to send role request notification email
+const sendRoleRequestNotification = async (
+  userEmail: string,
+  userName: string,
+  role: string,
+  action: "approved" | "rejected",
+  reviewNotes?: string
+) => {
+  try {
+    const { error } = await supabase.functions.invoke("notify-role-request", {
+      body: { userEmail, userName, role, action, reviewNotes },
+    });
+    if (error) throw error;
+    console.log(`Role request ${action} notification sent to ${userEmail}`);
+  } catch (error) {
+    console.error("Failed to send role request notification:", error);
+  }
+};
+
 export const RoleRequestsAdmin = () => {
   const { toast } = useToast();
   const [requests, setRequests] = useState<RoleRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("pending");
+  const [selectedRequests, setSelectedRequests] = useState<Set<string>>(new Set());
+  const [bulkDialog, setBulkDialog] = useState<{ open: boolean; action: "approve" | "reject" }>({
+    open: false,
+    action: "approve",
+  });
+  const [bulkNotes, setBulkNotes] = useState("");
   const [reviewDialog, setReviewDialog] = useState<{ open: boolean; request: RoleRequest | null; action: "approve" | "reject" }>({ 
     open: false, 
     request: null, 
@@ -106,6 +132,30 @@ export const RoleRequestsAdmin = () => {
 
   const pagination = usePagination({ data: filteredRequests, itemsPerPage: 10 });
 
+  // Toggle selection for a single request
+  const toggleSelection = (id: string) => {
+    const newSelected = new Set(selectedRequests);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedRequests(newSelected);
+  };
+
+  // Select all pending requests on current page
+  const selectAllPending = () => {
+    const pendingOnPage = pagination.paginatedData
+      .filter((r) => r.status === "pending")
+      .map((r) => r.id);
+    setSelectedRequests(new Set(pendingOnPage));
+  };
+
+  // Clear all selections
+  const clearSelections = () => {
+    setSelectedRequests(new Set());
+  };
+
   const handleReview = async () => {
     if (!reviewDialog.request) return;
 
@@ -164,6 +214,18 @@ export const RoleRequestsAdmin = () => {
         });
       }
 
+      // Send email notification
+      if (reviewDialog.request.user_email) {
+        const emailAction = reviewDialog.action === "approve" ? "approved" : "rejected";
+        await sendRoleRequestNotification(
+          reviewDialog.request.user_email,
+          reviewDialog.request.user_name || "User",
+          reviewDialog.request.requested_role,
+          emailAction,
+          reviewNotes || undefined
+        );
+      }
+
       toast({
         title: reviewDialog.action === "approve" ? "Request Approved" : "Request Rejected",
         description: `The role request has been ${newStatus}.`,
@@ -175,6 +237,100 @@ export const RoleRequestsAdmin = () => {
     } catch (error: any) {
       toast({
         title: "Error processing request",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle bulk approve/reject
+  const handleBulkReview = async () => {
+    if (selectedRequests.size === 0) return;
+
+    setIsSubmitting(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const newStatus = bulkDialog.action === "approve" ? "approved" : "rejected";
+      const selectedRequestsList = requests.filter((r) => selectedRequests.has(r.id) && r.status === "pending");
+
+      for (const req of selectedRequestsList) {
+        // Update the request status
+        const { error: updateError } = await supabase
+          .from("role_requests")
+          .update({
+            status: newStatus,
+            reviewed_by: user?.id,
+            reviewed_at: new Date().toISOString(),
+            review_notes: bulkNotes || null,
+          })
+          .eq("id", req.id);
+
+        if (updateError) throw updateError;
+
+        // If approved, assign the role
+        if (bulkDialog.action === "approve") {
+          const { error: roleError } = await supabase
+            .from("user_roles")
+            .insert({
+              user_id: req.user_id,
+              role: req.requested_role as AppRole,
+            });
+
+          if (roleError && !roleError.message.includes("duplicate")) {
+            console.warn(`Role assignment failed for ${req.user_id}:`, roleError.message);
+          }
+
+          await supabase.from("audit_logs").insert({
+            action: "role_request_approved",
+            resource_type: "role_request",
+            resource_id: req.id,
+            metadata: {
+              target_user_id: req.user_id,
+              role: req.requested_role,
+              bulk_action: true,
+            },
+          });
+        } else {
+          await supabase.from("audit_logs").insert({
+            action: "role_request_rejected",
+            resource_type: "role_request",
+            resource_id: req.id,
+            metadata: {
+              target_user_id: req.user_id,
+              role: req.requested_role,
+              reason: bulkNotes,
+              bulk_action: true,
+            },
+          });
+        }
+
+        // Send email notification
+        if (req.user_email) {
+          const emailAction = bulkDialog.action === "approve" ? "approved" : "rejected";
+          await sendRoleRequestNotification(
+            req.user_email,
+            req.user_name || "User",
+            req.requested_role,
+            emailAction,
+            bulkNotes || undefined
+          );
+        }
+      }
+
+      toast({
+        title: `Bulk ${bulkDialog.action === "approve" ? "Approval" : "Rejection"} Complete`,
+        description: `${selectedRequestsList.length} requests have been ${newStatus}.`,
+      });
+
+      setBulkDialog({ open: false, action: "approve" });
+      setBulkNotes("");
+      setSelectedRequests(new Set());
+      fetchRequests();
+    } catch (error: any) {
+      toast({
+        title: "Error processing bulk action",
         description: error.message,
         variant: "destructive",
       });
@@ -254,6 +410,36 @@ export const RoleRequestsAdmin = () => {
           </span>
         </div>
 
+        {/* Bulk Actions Bar */}
+        {selectedRequests.size > 0 && (
+          <div className="flex items-center gap-2 mb-4 p-3 bg-muted/50 rounded-lg">
+            <span className="text-sm font-medium">
+              {selectedRequests.size} selected
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-green-600 hover:text-green-700"
+              onClick={() => setBulkDialog({ open: true, action: "approve" })}
+            >
+              <CheckCheck className="h-4 w-4 mr-1" />
+              Approve All
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-red-600 hover:text-red-700"
+              onClick={() => setBulkDialog({ open: true, action: "reject" })}
+            >
+              <XOctagon className="h-4 w-4 mr-1" />
+              Reject All
+            </Button>
+            <Button size="sm" variant="ghost" onClick={clearSelections}>
+              Clear
+            </Button>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -264,6 +450,23 @@ export const RoleRequestsAdmin = () => {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-10">
+                      <Checkbox
+                        checked={
+                          pagination.paginatedData.filter((r) => r.status === "pending").length > 0 &&
+                          pagination.paginatedData
+                            .filter((r) => r.status === "pending")
+                            .every((r) => selectedRequests.has(r.id))
+                        }
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            selectAllPending();
+                          } else {
+                            clearSelections();
+                          }
+                        }}
+                      />
+                    </TableHead>
                     <TableHead>User</TableHead>
                     <TableHead>Requested Role</TableHead>
                     <TableHead>Reason</TableHead>
@@ -275,13 +478,21 @@ export const RoleRequestsAdmin = () => {
                 <TableBody>
                   {pagination.paginatedData.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                         No role requests found
                       </TableCell>
                     </TableRow>
                   ) : (
                     pagination.paginatedData.map((req) => (
-                      <TableRow key={req.id}>
+                      <TableRow key={req.id} className={selectedRequests.has(req.id) ? "bg-muted/50" : ""}>
+                        <TableCell>
+                          {req.status === "pending" && (
+                            <Checkbox
+                              checked={selectedRequests.has(req.id)}
+                              onCheckedChange={() => toggleSelection(req.id)}
+                            />
+                          )}
+                        </TableCell>
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="font-medium">{req.user_name}</span>
@@ -400,6 +611,55 @@ export const RoleRequestsAdmin = () => {
                 : reviewDialog.action === "approve"
                 ? "Approve Request"
                 : "Reject Request"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Review Dialog */}
+      <Dialog open={bulkDialog.open} onOpenChange={(open) => !open && setBulkDialog({ open: false, action: "approve" })}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Bulk {bulkDialog.action === "approve" ? "Approve" : "Reject"} Requests
+            </DialogTitle>
+            <DialogDescription>
+              {bulkDialog.action === "approve"
+                ? `Approve ${selectedRequests.size} selected role requests?`
+                : `Reject ${selectedRequests.size} selected role requests?`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">
+                Review Notes (applied to all)
+              </label>
+              <Textarea
+                placeholder={
+                  bulkDialog.action === "approve"
+                    ? "Optional notes for all approvals..."
+                    : "Reason for rejecting all requests..."
+                }
+                value={bulkNotes}
+                onChange={(e) => setBulkNotes(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBulkDialog({ open: false, action: "approve" })}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleBulkReview}
+              disabled={isSubmitting}
+              variant={bulkDialog.action === "approve" ? "default" : "destructive"}
+            >
+              {isSubmitting
+                ? "Processing..."
+                : bulkDialog.action === "approve"
+                ? `Approve ${selectedRequests.size} Requests`
+                : `Reject ${selectedRequests.size} Requests`}
             </Button>
           </DialogFooter>
         </DialogContent>

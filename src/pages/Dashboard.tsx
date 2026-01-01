@@ -15,6 +15,7 @@ import { CivilizationDashboard } from "./dashboards/CivilizationDashboard";
 import { ObserverDashboard } from "./dashboards/ObserverDashboard";
 import OpenAccessSanctumDashboard from "./dashboards/OpenAccessSanctumDashboard";
 import { RoleRequestForm } from "@/components/admin/RoleRequests";
+import { UserRoleHistory } from "@/components/admin/UserRoleHistory";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -156,10 +157,11 @@ const Dashboard = () => {
         {!isAdmin && userRole === 'observer' && <ObserverDashboard />}
         {!isAdmin && !userRole && <ObserverDashboard />}
         
-        {/* Role Request Form for non-admin users */}
+        {/* Role Request Form and History for non-admin users */}
         {!isAdmin && (
-          <div className="mt-8">
+          <div className="mt-8 space-y-6">
             <RoleRequestForm />
+            <UserRoleHistory />
           </div>
         )}
       </main>
