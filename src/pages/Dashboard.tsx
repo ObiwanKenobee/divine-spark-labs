@@ -16,6 +16,7 @@ import { ObserverDashboard } from "./dashboards/ObserverDashboard";
 import OpenAccessSanctumDashboard from "./dashboards/OpenAccessSanctumDashboard";
 import { RoleRequestForm } from "@/components/admin/RoleRequests";
 import { UserRoleHistory } from "@/components/admin/UserRoleHistory";
+import { PendingRequestsBadge } from "@/components/admin/PendingRequestsBadge";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -130,10 +131,13 @@ const Dashboard = () => {
             </h1>
             <div className="flex items-center gap-4">
               {isAdmin && (
-                <Button variant="outline" onClick={() => navigate("/admin")}>
-                  <Shield className="mr-2 h-4 w-4" />
-                  Admin
-                </Button>
+                <>
+                  <PendingRequestsBadge />
+                  <Button variant="outline" onClick={() => navigate("/admin")}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Admin
+                  </Button>
+                </>
               )}
               <span className="text-sm text-muted-foreground">
                 {user?.email}

@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Shield, Users, Settings, BarChart3, Database, FileKey } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { RolePermissionsMatrix } from "@/components/admin/RolePermissionsMatrix";
 
 export const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -95,6 +96,11 @@ export const AdminDashboard = () => {
             </Button>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Role Permissions Matrix */}
+      <div className="mt-8">
+        <RolePermissionsMatrix />
       </div>
     </>
   );
