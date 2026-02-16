@@ -38,7 +38,7 @@ const Footer = () => {
 
           <div className="space-y-4">
             <h4 className="text-lg font-semibold">Regional Hubs & Partnerships</h4>
-            <p className="text-sm text-primary-foreground/80">Regenerative funnel: Kenya → Jamaica → Global — building local credibility and compounding authority.</p>
+            <p className="text-sm text-primary-foreground/80">Regenerative funnel: Kenya → Jerusalem → Global — building local credibility and compounding authority.</p>
             <div className="grid grid-cols-2 gap-2 mt-3">
               <a href={regionLink('Kenya')} className="p-2 rounded bg-primary/10 text-sm inline-block text-center">Kenya Hub</a>
               <a href={regionLink('Jerusalem')} className="p-2 rounded bg-primary/10 text-sm inline-block text-center">Jerusalem Hub</a>
